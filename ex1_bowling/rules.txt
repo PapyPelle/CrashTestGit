@@ -1,0 +1,75 @@
+
+-- Denomination and rules --
+
+Frame : 10 pour 1 game
+Rolls : 2  pour 1 frame
+Pins  : 10 pour 1 frame
+
+Frame 1-9 : 2 Rolls max for 10 Pins
+Frame 10  : same + 2 Rolls if Strike / + 1 Roll if Spare
+
+On 1 Frame :
+    10 Pins -> Mark
+        1 Rolls -> Strike (+ no 2nd Roll)
+        2 Rolls -> Spare	
+    0-9 Pins + 2 Rolls -> OpenFrame
+
+
+-- Score of 1 Frame --
+
+FrameScore -> num Pin down
++ if Spare  -> add num Pin down next 1 Roll
++ if Strike -> add num Pin down next 2 Rolls (possibly on 2 Frames)
+
+
+-- Display --
+
+1st line :
+    n# Frame
+2nd line :
+    num Pin on each Roll (xy)
+    if Strike : x="X" y=""
+    if Spare  : y="/"
+    if x=0 or y=0 : write "-" instead
+3rd line :
+    Total score at the end of this Frame (add)
+    Can't display 3rd line before next Roll(s) if Spare or Strike
+
+
+
+-- DOC --
+
+Class Frame (abstract) :
+    -> NormalFrame (1-9)
+    -> LastFrame (10)
+
+    setPinsDown(x:int, y:int)
+        x = 1 - 2  (# Roll)
+        y = 0 - 10 (# Pins)
+        "BowlingException" if Roll order (1 then 2) not respected OR impossible #
+        if exception, doesn't change state
+
+    reset()
+        reset the Frame to 0, allowing new Rolls
+
+    countRoll()
+        current number of Rolls (in this Frame)
+
+    countPinsDown(x:int)
+        if x = null   : current number of Pins down
+        if x = 1 OR 2 : number of Pins down in the x Roll ; "-1" if x isn't registered yet
+
+    toString()
+        return string correponding to the 2nd line display of the Frame (empty space if no rolls)
+
+Class Game :
+
+    addFrame(f:Frame)
+        add the f frame to the game
+
+    getFrame(x:int)
+        return Frame object number x
+
+    getScore(x:int)
+        return cummulative score at Frame x
+

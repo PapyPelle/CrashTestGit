@@ -1,0 +1,110 @@
+<div class="no-overflow" id="yui_3_17_2_1_1589575661392_75"><img src="https://moodle.uqac.ca/pluginfile.php/398437/mod_assign/intro/bowling.jpg" alt="Bedrock Bowling" role="presentation" class="img-responsive atto_image_button_text-bottom" width="385" height="300">
+
+<h3>Objectifs</h3>
+
+<ul>
+<li>Transformer la description d'une situation en cas de test</li>
+<li>Utiliser la librairie jUnit pour automatiser l'exécution des tests</li>
+</ul>
+
+<h3>Contexte</h3>
+
+<p>En tant que responsable des équipements de la salle de quilles (<i>bowling</i>) de Saint-Granit, vous êtes chargé de tester le nouveau logiciel de calcul de pointage qui équipe maintenant toutes les allées.</p>
+
+<p>Rappelons d'abord les règles du jeu de quilles:</p>
+
+<ul id="yui_3_17_2_1_1589575661392_74">
+<li>La partie d'un joueur est divisée en dix <strong>carreaux</strong> (<i>frames</i>), numérotés de 1 à 10.</li>
+<li id="yui_3_17_2_1_1589575661392_73">Pour chacun des carreaux 1 à 9, le joueur effectue un ou deux <strong>lancers</strong> (<i>rolls</i>) pour tenter d'abattre les dix quilles (<i>pins</i>) se trouvant au bout de l'allée.
+</li><li>Lorsqu'un joueur abat dix quilles au <em>premier</em> lancer, il réussit ce que l'on appelle un <strong>abat</strong> (<i>strike</i>). Dans ce cas, il n'effectue pas de deuxième lancer et le carreau prend fin.</li>
+<li>S'il reste des quilles à abattre après le premier lancer, le joueur lance une deuxième fois. S'il abat toutes les quilles restantes, il réussit ce que l'on appelle une <strong>réserve</strong> (<i>spare</i>). (Cela signifie qu'abattre dix quilles après le premier lancer ne s'appelle <em>pas</em> un abat.)</li>
+<li>Le dixième et dernier carreau est spécial, car le joueur peut parfois lancer trois fois:
+<ul>
+<li>si le joueur réussit un abat, il lance deux autres fois et le carreau prend fin;</li>
+<li>si le joueur réussit une réserve après le deuxième lancer, il lance une troisième et dernière fois et le carreau prend fin;</li>
+<li>autrement, le joueur lance exactement deux fois.</li>
+</ul>
+</li></ul>
+
+<p>Un carreau où le joueur réussit à abattre les dix quilles (que ce soit en un ou deux lancers) s'appelle un <strong>carreau fermé</strong> (<i>mark</i>); autrement, on dit que le carreau est <strong>ouvert</strong> (<i>open frame</i>). Un lancer qui n'atteint aucune quille est appelé un <strong>dalot</strong>.</p>
+
+<p>La salle de quilles utilise le système de <a href="https://en.wikipedia.org/wiki/Ten-pin_bowling#Traditional_scoring">pointage traditionnel</a>, qui fonctionne comme suit:</p>
+
+<ul>
+<li>Le score d'un carreau ouvert est égal au nombre de quilles abattues.</li>
+<li>Le score d'un carreau fermé est égal au nombre de quilles abattues, auquel on ajoute des points <em>bonus</em>:
+<ul>
+<li>Dans le cas d'une réserve: les points bonus sont le nombre de quilles abattues dans le prochain lancer.</li>
+<li>Dans le cas d'un abat: les points bonus sont le nombre de quilles abattues dans les deux lancers <em>suivants</em>. (Attention: si le lancer suivant est lui aussi un abat, les deux prochains lancers se trouvent donc chacun dans un carreau.)</li>
+</ul>
+</li>
+</ul>
+
+<p>À mesure que la partie progresse, on inscrit le pointage d'un joueur dans une grille comme celle-ci:</p>
+
+<pre>|#1  |#2  |#3  |#4  |#5  |#6  |#7  |#8  |#9  |#10 |
++----+----+----+----+----+----+----+----+----+----|
+|  36|  X |  5-|  1/|  X |  --|  -6|  X |  2/| 1/3|
+|9   |24  |29  |49  |59  |59  |65  |85  |96  |109 |
+</pre>
+
+<p id="yui_3_17_2_1_1589575661392_79">On y retrouve sur la première ligne le numéro du carreau. Ensuite, dans chaque carreau, on voit le résultat des lancers: un dalot est noté par le symbole <tt>-</tt>, une réserve par <tt>/</tt>, et un abat par <tt>X</tt>; tous les autres lancers sont représentés par le chiffre correspondant au nombre de quilles abattues. Finalement, la dernière ligne donne le pointage <em id="yui_3_17_2_1_1589575661392_78">cumulatif</em> à ce point de la partie.</p>
+
+<p>Cet exemple de partie met en évidence les différents cas de figure du pointage traditionnel:</p>
+
+<ul>
+<li>Le carreau #1 est ouvert: son score est donc égal à la somme des quilles abattues dans les deux lancers (9=3+6).</li>
+<li>Le joueur a réussi un abat au carreau #2. Le score de ce carreau est donc égal à 10 + le nombre de quilles abattues lors des des deux lancers suivants (5 + 0), soit 15. Le score cumulatif est donc de 9+15=24.</li>
+<li>Le joueur a réussi une réserve au carreau #4: le score de ce carreau est donc de 10  + le nombre de quilles abattues au lancer suivant (10), soit 20. Le score cumulatif est donc de 29+20=49.</li>
+<li>Le joueur a réussi une réserve au carreau #10, il relance donc une troisième fois.</li>
+</ul>
+
+<h3>Librairie de pointage</h3>
+
+<p>Le système de pointage a été mis en place au moyen d'une librairie Java appelée <tt>bowling-score.jar</tt>, dont l'implémentation compilée est disponible sur le site du cours. La documentation de l'API de la librairie est également disponible.</p>
+
+<p>La classe <tt>Frame</tt> représente un carreau. On s'attend à ce qu'elle fournisse les fonctionnalités suivantes:</p>
+
+<ul>
+<li>La méthode <tt>setPinsDown(x,y)</tt> permet d'enregistrer que <tt>y</tt> quilles ont été abattues au lancer <tt>x</tt> du carreau (le premier lancer porte le numéro <tt>1</tt>). Cette méthode doit obliger l'utilisateur à entrer les lancers dans l'ordre: le lancer 1 avant le lancer 2, etc. Une exception de type <tt>BowlingException</tt> doit être lancée dans tous les autres cas. Cette méthode doit également lancer une exception pour des appels correspondant à des lancers impossibles à obtenir aux quilles ---soit directement, soit en rapport avec les lancers précédents du carreau. Lorsqu'une exception est lancée, l'objet ne change pas d'état.</li>
+<li>La méthode <tt>reset()</tt> doit effacer toute l'information du carreau, et permet de ré-enregistrer les lancers à partir du premier. Cette méthode peut être appelée en tout moment.</li>
+<li>La méthode <tt>countRolls()</tt> retourne le nombre de lancers qui ont eu lieu dans le carreau (en fonction des lancers qui ont été enregistrés jusqu'à ce point).</li>
+<li>La méthode <tt>countPinsDown()</tt> retourne le nombre total de quilles abattues dans le carreau (en fonction des lancers qui ont été enregistrés jusqu'à ce point).</li>
+<li>La méthode <tt>countPinsDown(x)</tt> retourne le nombre de quilles abattues au lancer <tt>x</tt> (le premier lancer est numéroté 1). Si ce lancer n'a pas eu lieu, la méthode retourne -1.</li>
+<li>La méthode <tt>toString()</tt> retourne sous forme de chaîne de caractères les symboles correspondant aux lancers du carreau; le bon symbole doit être utilsé dans le cas d'un dalleau, d'une réserve et d'un abat. La méthode doit <em>toujours</em> retourner deux caractères pour les carreaux 1-9, et trois caractères pour le carreau 10; si un lancer n'a pas été effectué, il est remplacé par un espace. Par exemple, dans le cas du carreau #1 ci-dessus, cette méthode doit retourner la chaîne <tt>"X "</tt> (le caractère "X" suivi d'un espace).</li>
+</ul>
+
+<p>Selon que l'on soit dans les carreaux 1 à 9 ou au dixième, on doit instancier les classes <tt>NormalFrame</tt> ou <tt>LastFrame</tt>, respectivement.</p>
+
+<p>La classe <tt>Game</tt> représente la partie d'un joueur. On lui ajoute des carreaux (donc des objets de type <tt>Frame</tt>) en utilisant sa méthode <tt>addFrame(f)</tt>. La méthode <tt>getFrame(x)</tt> permet d'obtenir l'objet <tt>Frame</tt> correspondant au carreau <tt>x</tt>. La méthode <tt>getScore(x)</tt> permet d'obtenir le score cumulatif jusqu'au carreau <tt>x</tt>.</p>
+
+<p>Au moyen d'une suite de tests jUnit, vérifiez que les classes <tt>NormalFrame</tt>, <tt>LastFrame</tt> et <tt>Game</tt> implémentent correctement la notation et le calcul de pointage du jeu de quilles, et suivent le comportement spécifié ci-dessus. On y a délibérément laissé des des erreurs, que votre suite de tests vise à découvrir. (Il y a plus d'une quinzaine d'erreurs distinctes.)</p>
+
+<p>Le fichier <tt>GameDemo.java</tt>, disponible sur le site du cours, montre comment saisir les données de la partie donnée en exemple ci-dessus.</p>
+
+<h3>Livrable</h3>
+
+<p>Sur le site Moodle du cours, remettez:</p>
+
+<ul>
+<li>Un <strong>unique</strong> fichier Java, appelé <tt>BowlingTest.java</tt>, contenant la suite de tests que vous avez créée. Chacun des cas de test doit avoir un nom descriptif (i.e. n'utilisez pas <tt>test1()</tt>, <tt>test2()</tt>, etc.), et être précédé d'un <strong>commentaire Javadoc</strong> décrivant en une phrase ou deux ce que vise à vérifier ce test particulier.</li>
+</ul>
+
+<h3>Notation</h3>
+
+<p>Les points seront accordés au devoir selon le barème suivant:</p>
+
+<table border="1">
+<tbody><tr>
+<th>Élément</th><th>Points</th>
+</tr>
+<tr><td>Présence de commentaires appropriés</td><td>1</td></tr>
+<tr><td>Présence d'un test utilisant une assertion</td><td>1</td></tr>
+<tr><td>Présence d'un test contrôlant une exception</td><td>1</td></tr>
+<tr><td>Présence d'un test paramétrisé</td><td>2</td></tr>
+<tr><td>Nombre d'éléments valides contrôlés</td><td>15</td></tr>
+<tr><td>Nombre d'erreurs distinctes détectées</td><td>15</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>35</strong></td></tr>
+</tbody></table>
+
+<p>Un travail qui ne respecte pas les consignes, qui ne compile pas ou qui s'exécute en produisant des erreurs inattendues se verra donner la note de zéro. Il est de la responsabilité de l'étudiant de vérifier le fichier avant de le remettre.</p></div>
