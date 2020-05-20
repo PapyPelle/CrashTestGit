@@ -37,7 +37,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(5) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_classicValue5_noException() {
+	public void testNormalFrame_Constructor_validValue5_noException() {
 		new NormalFrame(5);
 	}
 
@@ -45,7 +45,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(8) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_classicValue8_noException() {
+	public void testNormalFrame_Constructor_validValue8_noException() {
 		new NormalFrame(8);
 	}
 
@@ -101,7 +101,7 @@ public class bowlingTest
 	 * Test that new LastFrame(10) does not throw.
 	 */
 	@Test
-	public void testLastFrame_Constructor_classicValue_noException() {
+	public void testLastFrame_Constructor_validValue_noException() {
 		new LastFrame(10);
 	}
 
