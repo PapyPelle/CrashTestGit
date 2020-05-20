@@ -7,9 +7,6 @@ import org.junit.*;
 
 public class bowlingTest
 {
-	private static boolean NORMAL_FRAME = false;
-	private static boolean LAST_FRAME   = true;
-	
 	public Frame normalFrame;
 	public Frame lastFrame;
 
@@ -29,144 +26,268 @@ public class bowlingTest
 	
 	//----------------------------------------- FRAME CONSTRUCTOR -----------------------------------------
 			
-	/**
-	 * Return "true" if a BowlingException is thrown while creating the Frame object
-	 * @param number The number used to initialize Frame(int)
-	 * @param isLastFrame True if we are testing a LastFrame type of Frame (false is NormalFrame)
+
+	/*
+	 * Several tests on different Frame initializations
+	 *   A standard bowling game is composed of 9 NormalFrame (1 to 9) and a LastFrame (10)
+	 *   All other initializer values are expected to throw a BowlingException
 	 */
-	private boolean isExceptionFrameConstructor(int number, boolean isLastFrame) {
-		try {
-			@SuppressWarnings("unused")
-			Frame f;
-			if (isLastFrame)
-				f = new LastFrame(number);
-			else
-				f = new NormalFrame(number);
-			return false;
-		} catch (BowlingException e) {
-			return true;
-		}
+	
+	/*
+	 * Test that new NormalFrame(5) does not throw.
+	 */
+	@Test
+	public void testNormalFrame_Constructor_classicValue5_noException() {
+		new NormalFrame(5);
 	}
 
-	/**
-	 * Several tests on different Frame initializations
-	 *   NOTE: No specification given. Since an exception is only thrown outside [0:10] 
-	 *   range for both Normal and Last Frame this make no sense what to expect;
-	 *   So let's just say you are only allowed to build a standard 1 to 10 frame game
+	/*
+	 * Test that new NormalFrame(8) does not throw.
 	 */
 	@Test
-	public void testNormalFrameConstructor_classicValue5_noException() {
-		assertFalse("NormalFrame(5) : exception is thrown (shouldn't)", isExceptionFrameConstructor(5,  NORMAL_FRAME));
+	public void testNormalFrame_Constructor_classicValue8_noException() {
+		new NormalFrame(8);
 	}
+
+	/*
+	 * Test that new NormalFrame(1) does not throw.
+	 */
 	@Test
-	public void testNormalFrameConstructor_classicValue8_noException() {
-		assertFalse("NormalFrame(8) : exception is thrown (shouldn't)", isExceptionFrameConstructor(8,  NORMAL_FRAME));
+	public void testNormalFrame_Constructor_minValue_noException() {
+		new NormalFrame(1);
 	}
+
+	/*
+	 * Test that new NormalFrame(9) does not throw.
+	 */
 	@Test
-	public void testNormalFrameConstructor_minValue_noException() {
-		assertFalse("NormalFrame(1) : exception is thrown (shouldn't)", isExceptionFrameConstructor(1,  NORMAL_FRAME));
+	public void testNormalFrame_Constructor_maxValue_noException() {
+		new NormalFrame(9);
 	}
+
+	/*
+	 * Test that new NormalFrame(0) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_Constructor_zeroValue_throwBowlingException() {
+		new NormalFrame(0);
+	}
+
+	/*
+	 * Test that new NormalFrame(-9) throws a BownlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_Constructor_negativeValue_throwBowlingException() {
+		new NormalFrame(-9);
+	}
+
+	/*
+	 * Test that new NormalFrame(10) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_Constructor_wrongValue10_throwBowlingException() {
+		new NormalFrame(10);
+	}
+
+	/*
+	 * Test that new NormalFrame(20) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_Constructor_wrongValue20_throwBowlingException() {
+		new NormalFrame(20);
+	}
+
+	/*
+	 * Test that new LastFrame(10) does not throw.
+	 */
 	@Test
-	public void testNormalFrameConstructor_maxValue_noException() {
-		assertTrue("NormalFrame(9) : exception is thrown (shouldn't)",  isExceptionFrameConstructor(9,  NORMAL_FRAME));
+	public void testLastFrame_Constructor_classicValue_noException() {
+		new LastFrame(10);
 	}
-	@Test
-	public void testNormalFrameConstructor_zeroValue_throwBowlingException() {
-		assertTrue("NormalFrame(0) : should throw an exception",        isExceptionFrameConstructor(0,  NORMAL_FRAME));
+
+	/*
+	 * Test that new LastFrame(0) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testLastFrame_Constructor_zeroValue_throwBowlingException() {
+		new LastFrame(0);
 	}
-	@Test
-	public void testNormalFrameConstructor_negativeValue_throwBowlingException() {
-		assertTrue("NormalFrame(-9) : should throw an exception",       isExceptionFrameConstructor(-9, NORMAL_FRAME));
+
+	/*
+	 * Test that new LastFrame(-5) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testLastFrame_Constructor_negativeValue_throwBowlingException() {
+		new LastFrame(-5);
 	}
-	@Test
-	public void testNormalFrameConstructor_wrongValue10_throwBowlingException() {
-		assertTrue("NormalFrame(10) : should throw an exception",       isExceptionFrameConstructor(10, NORMAL_FRAME));
+
+	/*
+	 * Test that new LastFrame(9) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testLastFrame_Constructor_wrongValue9_throwBowlingException() {
+		new LastFrame(9);
 	}
-	@Test
-	public void testNormalFrameConstructor_wrongValue20_throwBowlingException() {
-		assertTrue("NormalFrame(20) : should throw an exception",       isExceptionFrameConstructor(20, NORMAL_FRAME));
+
+	/*
+	 * Test that new LastFrame(11) throws a BowlingException.
+	 */
+	@Test (expected = BowlingException.class)
+	public void testLastFrame_Constructor_wrongValue11_throwBowlingException() {
+		new LastFrame(11);
 	}
-	@Test
-	public void testLastFrameConstructor_classicValue_noException() {
-		assertFalse("LastFrame(10) : exception is thrown (shouldn't)",   isExceptionFrameConstructor(10, LAST_FRAME));
-	}
-	@Test
-	public void testLastFrameConstructor_zeroValue_throwBowlingException() {
-		assertTrue("LastFrame(0) : should throw an exception",          isExceptionFrameConstructor(0,  LAST_FRAME));
-	}
-	@Test
-	public void testLastFrameConstructor_negativeValue_shouldThrowBowlingException() {
-		assertTrue("LastFrame(-5) : should throw an exception",         isExceptionFrameConstructor(-5, LAST_FRAME));
-	}
-	@Test
-	public void testLastFrameConstructor_wrongValue9_throwBowlingException() {
-		assertTrue("LastFrame(9) : should throw an exception",          isExceptionFrameConstructor(9,  LAST_FRAME));
-	}
-	@Test
-	public void testLastFrameConstructor_wrongValue11_throwBowlingException() {
-		assertTrue("LastFrame(11) : should throw an exception",         isExceptionFrameConstructor(11, LAST_FRAME));
-	}
-	// All of this could be automatic with parameters of what to test and what to expect but we didn't know how to do so in JUNIT
-	// (and we only have one class to parameterize so we use it for something else)
+	/* 
+	 * All of this could be automatic with parameters of what to test and what to expect but we didn't know how to do so in JUNIT
+	 * (and we only have one class to parameterize so we use it for something else)
+	 */
 
 	
 	//----------------------------------------- FRAME COUNTROLLS METHOD -----------------------------------------
 	
 	/**
-	 * Test normal and last frame countRoll() return value to be 0 at initialization 
+	 * Test NormalFrame.countRoll() return value to be 0 at initialization 
 	 */
 	@Test
-	public void testCountRolls_newFrame() {
-		assertEquals("new NormalFrame countRolls should be 0 : ", 0, normalFrame.countRolls());
-		assertEquals("new LastFrame countRolls should be 0 : ",   0, lastFrame.countRolls());
+	public void testNormalFrame_CountRolls_onNewFrame() {
+		assertEquals("Invalid rolls count : ", 0, normalFrame.countRolls());
+	}
+
+	/**
+	 * Test LastFrame.countRoll() return value to be 0 at initialization 
+	 */
+	@Test
+	public void testLastFrame_CountRolls_onNewFrame() {
+		assertEquals("Invalid rolls count : ",   0, lastFrame.countRolls());
 	}
 	
 	/**
-	 * Test normal and last frame countRoll() return value to be 0 after reset 
+	 * Test NormalFrame.countRoll() return value to be 0 after reset 
 	 */
 	@Test
-	public void testCountRolls_resetFrame() {
+	public void testNormalFrame_CountRolls_afterReset() {
 		normalFrame.setPinsDown(1, 1);
 		normalFrame.reset();
-		assertEquals("reseted NormalFrame countRolls should be 0 : ", 0, normalFrame.countRolls());
+		assertEquals("Invalid rolls count : ", 0, normalFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 0 after reset 
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterReset() {
 		lastFrame.setPinsDown(1, 1);
 		lastFrame.reset();
-		assertEquals("reseted LastFrame countRolls should be 0 : ",   0, lastFrame.countRolls());
+		assertEquals("Invalid rolls count : ",   0, lastFrame.countRolls());
 	}
 	
 	/**
-	 * Test normal and last frame countRoll() return value to be 1 after one setPinsDown(1,1)
+	 * Test NormalFrame.countRoll() return value to be 1 after one setPinsDown(1,1)
 	 */
 	@Test
-	public void testCountRolls_oneRoll() {
+	public void testNormalFrame_CountRolls_afterOneRoll() {
 		normalFrame.setPinsDown(1, 1);
-		assertEquals("after 1 roll NormalFrame countRolls should be 1 : ", 1, normalFrame.countRolls());
-		lastFrame.setPinsDown(1, 1);
-		assertEquals("after 1 roll LastFrame countRolls should be 1 : ", 1, lastFrame.countRolls());
+		assertEquals("Invalid rolls count : ", 1, normalFrame.countRolls());
 	}
 	
 	/**
-	 * Test normal and last frame countRoll() return value to be 2 after two setPinsDown(1:2, 1) 
+	 * Test LastFrame.countRoll() return value to be 1 after one setPinsDown(1,1)
 	 */
 	@Test
-	public void testCountRolls_twoRolls() {
-		normalFrame.setPinsDown(1, 1);
-		normalFrame.setPinsDown(2, 1);
-		assertEquals("after 2 rolls NormalFrame countRolls should be 2 : ", 2, normalFrame.countRolls());
+	public void testLastFrame_CountRolls_afterOneRoll() {
 		lastFrame.setPinsDown(1, 1);
-		lastFrame.setPinsDown(2, 1);
-		assertEquals("after 2 rolls LastFrame countRolls should be 2 : ", 2, lastFrame.countRolls());
+		assertEquals("Invalid rolls count : ", 1, lastFrame.countRolls());
 	}
 	
 	/**
-	 * Test last frame countRoll() return value to be 3 after three setPinsDown(1:3, 5) (allowed by a spare)
+	 * Test NormalFrame.countRoll() return value to be 2 after two setPinsDown(1:2, 1) 
 	 */
 	@Test
-	public void testCountRolls_threeRolls() {
+	public void testNormalFrame_CountRolls_afterTwoRolls() {
+		normalFrame.setPinsDown(1, 1).setPinsDown(2, 1);
+		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 2 after two setPinsDown(1:2, 1) 
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterTwoRolls() {
+		lastFrame.setPinsDown(1, 1).setPinsDown(2, 1);
+		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
+	}
+	
+	/**
+	 * Test NormalFrame.countRoll() return value to be 1 after one setPinsDown(1,0)
+	 */
+	@Test
+	public void testNormalFrame_CountRolls_afterGutterOnFirstRoll() {
+		normalFrame.setPinsDown(1, 0);
+		assertEquals("Invalid rolls count : ", 1, normalFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 1 after one setPinsDown(1,0)
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterGutterOnFirstRoll() {
+		lastFrame.setPinsDown(1, 0);
+		assertEquals("Invalid rolls count : ", 1, lastFrame.countRolls());
+	}
+	
+	/**
+	 * Test NormalFrame.countRoll() return value to be 2 after one setPinsDown(1,1) and one setPinsDown(2,0)
+	 */
+	@Test
+	public void testNormalFrame_CountRolls_afterGutterOnSecondRoll() {
+		normalFrame.setPinsDown(1, 1).setPinsDown(2, 0);
+		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 2 after one setPinsDown(1,1) and one setPinsDown(2,0)
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterGutterOnSecondRoll() {
+		lastFrame.setPinsDown(1, 1).setPinsDown(2, 0);
+		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
+	}
+	
+	/**
+	 * Test NormalFrame.countRoll() return value to be 2 after one setPinsDown(1,0) and one setPinsDown(2,0)
+	 */
+	@Test
+	public void testNormalFrame_CountRolls_afterTwoGutters() {
+		normalFrame.setPinsDown(1, 0).setPinsDown(2, 0);
+		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 2 after one setPinsDown(1,0) and one setPinsDown(2,0)
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterTwoGutters() {
+		lastFrame.setPinsDown(1, 0).setPinsDown(2, 0);
+		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 3 after three setPinsDown(1:3, 5) (allowed by a spare)
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterThreeRolls() {
 		lastFrame.setPinsDown(1, 5);
 		lastFrame.setPinsDown(2, 5);
 		lastFrame.setPinsDown(3, 5);
-		assertEquals("after 3 rolls LastFrame countRolls should be 3", 3, lastFrame.countRolls());
+		assertEquals("Invalid rolls count : ", 3, lastFrame.countRolls());
+	}
+	
+	/**
+	 * Test LastFrame.countRoll() return value to be 3 after two setPinsDown(1:2,5) and one setPinsDown(3,0)
+	 */
+	@Test
+	public void testLastFrame_CountRolls_afterGutterOnThirdRoll() {
+		lastFrame.setPinsDown(1, 5).setPinsDown(2, 5).setPinsDown(3, 0);
+		assertEquals("Invalid rolls count : ", 3, lastFrame.countRolls());
 	}
 	
 	
@@ -178,12 +299,10 @@ public class bowlingTest
 	@Test
 	public void testFrameNumber() {
 		for(int i=1; i < 11; i++) {
-			Frame f;
 			if (i == 10)
-				f = new LastFrame(i);
+				assertEquals("LastFrame.getFrameNumber() returns wrong value", i, new LastFrame(i).getFrameNumber());
 			else
-				f = new NormalFrame(i);
-			assertEquals("Method Frame Number give wrong number", i, f.getFrameNumber());
+				assertEquals("NormalFrame.getFrameNumber() returns wrong value", i, new NormalFrame(i).getFrameNumber());
 		}
 	}
 	
