@@ -1,6 +1,7 @@
 package stev.bowling;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 import org.junit.*;
 
@@ -38,7 +39,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(5) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_validValue5_noException() {
+	public void testNormalFrame_Constructor_withValidValue5_noException() {
 		new NormalFrame(5);
 	}
 
@@ -46,7 +47,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(8) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_validValue8_noException() {
+	public void testNormalFrame_Constructor_withValidValue8_noException() {
 		new NormalFrame(8);
 	}
 
@@ -54,7 +55,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(1) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_minValue_noException() {
+	public void testNormalFrame_Constructor_withMinValue1_noException() {
 		new NormalFrame(1);
 	}
 
@@ -62,7 +63,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(9) does not throw.
 	 */
 	@Test
-	public void testNormalFrame_Constructor_maxValue_noException() {
+	public void testNormalFrame_Constructor_withMaxValue9_noException() {
 		new NormalFrame(9);
 	}
 
@@ -70,7 +71,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(0) throws a BowlingException.
 	 */
 	@Test (expected = BowlingException.class)
-	public void testNormalFrame_Constructor_zeroValue_throwBowlingException() {
+	public void testNormalFrame_Constructor_withZeroValue_throwsBowlingException() {
 		new NormalFrame(0);
 	}
 
@@ -78,7 +79,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(-9) throws a BownlingException.
 	 */
 	@Test (expected = BowlingException.class)
-	public void testNormalFrame_Constructor_negativeValue_throwBowlingException() {
+	public void testNormalFrame_Constructor_withNegativeValueMinus9_throwsBowlingException() {
 		new NormalFrame(-9);
 	}
 
@@ -86,7 +87,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(10) throws a BowlingException.
 	 */
 	@Test (expected = BowlingException.class)
-	public void testNormalFrame_Constructor_wrongValue10_throwBowlingException() {
+	public void testNormalFrame_Constructor_withIllegalValue10_throwsBowlingException() {
 		new NormalFrame(10);
 	}
 
@@ -94,7 +95,7 @@ public class bowlingTest
 	 * Test that new NormalFrame(20) throws a BowlingException.
 	 */
 	@Test (expected = BowlingException.class)
-	public void testNormalFrame_Constructor_wrongValue20_throwBowlingException() {
+	public void testNormalFrame_Constructor_withIllegalValue20_throwsBowlingException() {
 		new NormalFrame(20);
 	}
 
@@ -104,7 +105,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 0 at initialization 
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_onNewFrame() {
+	public void testNormalFrame_countRolls_onNewFrame_returns0() {
 		assertEquals("Invalid rolls count : ", 0, normalFrame.countRolls());
 	}
 
@@ -112,7 +113,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 0 after reset 
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterReset() {
+	public void testNormalFrame_countRolls_afterReset_returns0() {
 		normalFrame.setPinsDown(1, 1);
 		normalFrame.reset();
 		assertEquals("Invalid rolls count : ", 0, normalFrame.countRolls());
@@ -122,7 +123,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 1 after one setPinsDown(1,1)
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterOneRoll() {
+	public void testNormalFrame_countRolls_afterOneRoll_returns1() {
 		normalFrame.setPinsDown(1, 1);
 		assertEquals("Invalid rolls count : ", 1, normalFrame.countRolls());
 	}
@@ -131,7 +132,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 2 after two setPinsDown(1:2, 1) 
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterTwoRolls() {
+	public void testNormalFrame_countRolls_afterTwoRolls_returns2() {
 		normalFrame.setPinsDown(1, 1).setPinsDown(2, 1);
 		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
 	}
@@ -140,7 +141,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 1 after one setPinsDown(1,0)
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterGutterOnFirstRoll() {
+	public void testNormalFrame_countRolls_afterGutterOnFirstRoll_returns1() {
 		normalFrame.setPinsDown(1, 0);
 		assertEquals("Invalid rolls count : ", 1, normalFrame.countRolls());
 	}
@@ -149,7 +150,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 2 after one setPinsDown(1,1) and one setPinsDown(2,0)
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterGutterOnSecondRoll() {
+	public void testNormalFrame_countRolls_afterGutterOnSecondRoll_returns2() {
 		normalFrame.setPinsDown(1, 1).setPinsDown(2, 0);
 		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
 	}
@@ -158,7 +159,7 @@ public class bowlingTest
 	 * Test NormalFrame.countRoll() return value to be 2 after one setPinsDown(1,0) and one setPinsDown(2,0)
 	 */
 	@Test
-	public void testNormalFrame_CountRolls_afterTwoGutters() {
+	public void testNormalFrame_countRolls_afterTwoGutters_returns2() {
 		normalFrame.setPinsDown(1, 0).setPinsDown(2, 0);
 		assertEquals("Invalid rolls count : ", 2, normalFrame.countRolls());
 	}
@@ -169,7 +170,7 @@ public class bowlingTest
 	 * Test the result of the method NormalFrame.getFrameNumber() for frame 1 to 9
 	 */
 	@Test
-	public void testNormalFrame_FrameNumber_returnsIntializationValue() {
+	public void testNormalFrame_getFrameNumber_returnsInitializationValue() {
 		int begin = 1, end = 9;
 		
 		int[] expected = new int[end - begin + 1];
@@ -183,12 +184,185 @@ public class bowlingTest
 		assertArrayEquals("Results don't match with expected values : ", expected, result);
 	}
 	
-	//------------------------------------- NormalFrame.setPinDown() -------------------------------------
+	//--------------------------------- NormalFrame.setPinDown(int, int) ---------------------------------
 	
-	//------------------------------------ NormalFrame.setPinDown(int) -----------------------------------
+	/**
+	 * Test that setting some pins down in an invalid order (2nd throw before 1st) throws a BowlingException 
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_whenWrongRollOrder_throwsBowlingException() {
+		normalFrame.setPinsDown(2, 1).setPinsDown(1, 1);
+	}
 	
-	//----------------------------------- NormalFrame.countPinsDown(int) ---------------------------------
+	/**
+	 * Test that setting 0 pins down in an invalid order (2nd throw before 1st) throws a BowlingException 
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_whenWrongRollOrderWithGutterRolls_throwsBowlingException() {
+		normalFrame.setPinsDown(2, 0).setPinsDown(1, 0);
+	}
 	
+	/**
+	 * Test that trying to set pins down for a negative roll value throws a BowlingException 
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withNegativeRollValueMinus1_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(-1, 1);
+	}
+	
+	/**
+	 * Test that trying to set pins down for a 0th roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withIllegalRollValue0_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(0, 1);
+	}
+	
+	/**
+	 * Test that trying to set pins down for a 3rd roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withIllegalRollValue3_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(3, 1);
+	}
+	
+	/**
+	 * Test that setting a negative number of pins down on 1st roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withNegativePinsValueOnFirstRollMinus1_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(1, -1);
+	}
+
+	/**
+	 * Test that setting a negative number of pins down on 2nd roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withNegativePinsValueOnSecondRollMinus1_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(1, 5);
+		normalFrame.setPinsDown(2, -1);
+	}
+	
+	/**
+	 * Test that setting an invalid number of pins down (11) in one roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withIllegalPinsValueInOneRol11_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(1, 11);
+	}
+	
+	/**
+	 * Test that setting an invalid number of pins down (11) in two rolls throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_withInvalidPinsValueInTwoRolls11_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(1, 5).setPinsDown(2, 6);
+	}
+	
+	/**
+	 * Test that calling setPinsDown twice for the same roll throws a BowlingException
+	 */
+	@Test (expected = BowlingException.class)
+	public void testNormalFrame_setPinsDown_whenCalledTwiceWithSameRollValue_throwsBowlingException()
+	{
+		normalFrame.setPinsDown(1, 1).setPinsDown(1, 1);
+	}
+	
+	/**
+	 * Test that when setPinsDown throws, the frame is left untouched
+	 */
+	@Test
+	public void testNormalFrame_setPinsDown_whenBowlingExceptionThrown_frameIsUnchanged()
+	{
+		normalFrame.setPinsDown(1, 1);
+		try
+		{
+			normalFrame.setPinsDown(1, 2);	
+		}
+		catch (BowlingException e)
+		{
+			assertEquals(1, normalFrame.getPinsDown(1));
+		}
+		fail("Calling setPinsDown twice for the same roll should throw BowlingException, but it did not.");
+	}
+	
+	//------------------------------------ NormalFrame.countPinsDown() -----------------------------------
+	
+	/**
+	 * Test that NormalFrame.countPinsDown() returns 0 after initialization 
+	 */
+	@Test
+	public void testNormalFrame_countPinsDown_onNewFrame_returns0() {
+		assertEquals("Invalid pins down count : ", 0, normalFrame.countPinsDown());
+	}
+
+	/**
+	 * Test that NormalFrame.countPinsDown() returns 0 after a call to reset() 
+	 */
+	@Test
+	public void testNormalFrame_countPinsDown_afterReset_returns0() {
+		normalFrame.setPinsDown(1, 1);
+		normalFrame.reset();
+		assertEquals("Invalid pins down count : ", 0, normalFrame.countPinsDown());
+	}
+	
+	/**
+	 * Test that NormalFrame.countPinsDown() returns 10 after scoring a strike
+	 */
+	@Test
+	public void testNormalFrame_countPinsDown_onStrike_returns10()
+	{
+		normalFrame.setPinsDown(1, 10);
+		assertEquals("Invalid pins down count : ", 10, normalFrame.countPinsDown());
+	}
+	
+	/**
+	 * Test that NormalFrame.countPinsDown() returns 10 after scoring a spare (5+5)
+	 */
+	@Test
+	public void testNormalFrame_countPinsDown_onSpare_returns10()
+	{
+		normalFrame.setPinsDown(1, 5).setPinsDown(2, 5);
+		assertEquals("Invalid pins down count : ", 10, normalFrame.countPinsDown());
+	}
+	
+	/**
+	 * Test that NormalFrame.countPinsDown() returns 10 after scoring a spare with a gutter (0+10)
+	 */
+	@Test
+	public void testNormalFrame_countPinsDown_onSpareAfterGutter_returns10()
+	{
+		normalFrame.setPinsDown(1, 0).setPinsDown(2, 10);
+		assertEquals("Invalid pins down count : ", 10, normalFrame.countPinsDown());
+	}
+	
+	//------------------------------------ NormalFrame.getPinsDown(int) ----------------------------------
+	
+	/**
+	 * Test that NormalFrame.getPinsDown(1)
+	 */
+	@Test
+	public void testNormalFrame_getPinsDown_withInvalidRollIndex1_onNewFrame_returnsMinus1()
+	{
+		assertEquals("Invalid result : ", -1, normalFrame.getPinsDown(1));
+	}
+	
+	/**
+	 * Test that NormalFrame.getPinsDown(1)
+	 */
+	@Test
+	public void testNormalFrame_getPinsDown_withInvalidRollIndex2_afterOneRoll_returnsMinus1()
+	{
+		normalFrame.setPinsDown(1, 1);
+		assertEquals("Invalid result : ", -1, normalFrame.getPinsDown(2));
+	}
 	
 	//----------------------------------------------------------------------------------------------------
 	//-------------------------------------------- LastFrame ---------------------------------------------
@@ -247,7 +421,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 0 at initialization 
 	 */
 	@Test
-	public void testLastFrame_CountRolls_onNewFrame() {
+	public void testLastFrame_countRolls_onNewFrame() {
 		assertEquals("Invalid rolls count : ",   0, lastFrame.countRolls());
 	}
 	
@@ -255,7 +429,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 0 after reset 
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterReset() {
+	public void testLastFrame_countRolls_afterReset() {
 		lastFrame.setPinsDown(1, 1);
 		lastFrame.reset();
 		assertEquals("Invalid rolls count : ",   0, lastFrame.countRolls());
@@ -265,7 +439,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 1 after one setPinsDown(1,1)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterOneRoll() {
+	public void testLastFrame_countRolls_afterOneRoll() {
 		lastFrame.setPinsDown(1, 1);
 		assertEquals("Invalid rolls count : ", 1, lastFrame.countRolls());
 	}
@@ -274,7 +448,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 2 after two setPinsDown(1:2, 1) 
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterTwoRolls() {
+	public void testLastFrame_countRolls_afterTwoRolls() {
 		lastFrame.setPinsDown(1, 1).setPinsDown(2, 1);
 		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
 	}
@@ -283,7 +457,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 1 after one setPinsDown(1,0)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterGutterOnFirstRoll() {
+	public void testLastFrame_countRolls_afterGutterOnFirstRoll() {
 		lastFrame.setPinsDown(1, 0);
 		assertEquals("Invalid rolls count : ", 1, lastFrame.countRolls());
 	}
@@ -292,7 +466,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 2 after one setPinsDown(1,1) and one setPinsDown(2,0)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterGutterOnSecondRoll() {
+	public void testLastFrame_countRolls_afterGutterOnSecondRoll() {
 		lastFrame.setPinsDown(1, 1).setPinsDown(2, 0);
 		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
 	}
@@ -301,7 +475,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 2 after one setPinsDown(1,0) and one setPinsDown(2,0)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterTwoGutters() {
+	public void testLastFrame_countRolls_afterTwoGutters() {
 		lastFrame.setPinsDown(1, 0).setPinsDown(2, 0);
 		assertEquals("Invalid rolls count : ", 2, lastFrame.countRolls());
 	}
@@ -310,7 +484,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 3 after three setPinsDown(1:3, 5) (allowed by a spare)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterThreeRolls() {
+	public void testLastFrame_countRolls_afterThreeRolls() {
 		lastFrame.setPinsDown(1, 5);
 		lastFrame.setPinsDown(2, 5);
 		lastFrame.setPinsDown(3, 5);
@@ -321,7 +495,7 @@ public class bowlingTest
 	 * Test LastFrame.countRoll() return value to be 3 after two setPinsDown(1:2,5) and one setPinsDown(3,0)
 	 */
 	@Test
-	public void testLastFrame_CountRolls_afterGutterOnThirdRoll() {
+	public void testLastFrame_countRolls_afterGutterOnThirdRoll() {
 		lastFrame.setPinsDown(1, 5).setPinsDown(2, 5).setPinsDown(3, 0);
 		assertEquals("Invalid rolls count : ", 3, lastFrame.countRolls());
 	}
@@ -338,8 +512,12 @@ public class bowlingTest
 	
 	//-------------------------------------- LastFrame.setPinDown() --------------------------------------
 	
-	//------------------------------------- LastFrame.setPinDown(int) ------------------------------------
+	//------------------------------------- LastFrame.countPinsDown() ------------------------------------
 	
-	//------------------------------------ LastFrame.countPinsDown(int) ----------------------------------
+	//------------------------------------- LastFrame.getPinDown(int) ------------------------------------
+	
+	//----------------------------------------------------------------------------------------------------
+	//----------------------------------------------- Game -----------------------------------------------
+	//----------------------------------------------------------------------------------------------------
 	
 }
