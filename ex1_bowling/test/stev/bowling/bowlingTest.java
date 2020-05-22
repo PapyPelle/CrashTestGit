@@ -530,7 +530,7 @@ public class bowlingTest
 		 * Test odd game initialization (full NormalFrame)
 		 */
 		@Test (expected = BowlingException.class)
-		public void testGame_FullCreationNormalFrame() {
+		public void testGame_CreationFullNormalFrame() {
 			Game g = new Game();
 			for (int i=1; i<11; i++) {
 				g.addFrame(new NormalFrame(i));
@@ -549,13 +549,11 @@ public class bowlingTest
 		}
 		
 		/**
-		 * Test getCumulativeScore return value (-1) for empty game
+		 * Test getCumulativeScore return value (0) for empty game first frame
 		 */
 		@Test
 		public void testGame_CumulativeScoreEmpty() {
-			for (int i=1; i<11; i++) {
-				assertEquals(-1, game.getCumulativeScore(i));
-			}
+			assertEquals(0, game.getCumulativeScore(1));
 		}
 		
 		
