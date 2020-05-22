@@ -6,7 +6,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="dep/bowling-score.jar"/>
+	<classpathentry kind="lib" path="dep/bowling-score.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ex1_bowling/dep/bowling-score.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -15,14 +15,21 @@ import org.junit.runners.Parameterized.Parameters;
 public class bowlingTest
 {
 	public static class FrameTest {
+
 		public Frame normalFrame;
 		public Frame lastFrame;
+		public Game game;
 	
 		@Before
 		public void setUp() throws Exception 
 		{
 			normalFrame = new NormalFrame(1);
 			lastFrame   = new LastFrame(10);
+			game = new Game();
+			for (int i=1; i<10; i++) {
+				game.addFrame(new NormalFrame(i));
+			}
+			game.addFrame(new LastFrame(10));	
 		}
 	
 		@After
@@ -506,16 +513,7 @@ public class bowlingTest
 			lastFrame.setPinsDown(1, 5).setPinsDown(2, 5).setPinsDown(3, 0);
 			assertEquals("Invalid rolls count : ", 3, lastFrame.countRolls());
 		}
-	
-		//----------------------------------- NormalFrame.getFrameNumber() -----------------------------------
-		
-		/**
-		 * Test the result of the method LastFrame.getFrameNumber() for frame 10
-		 */
-		@Test
-		public void testLastFrame_FrameNumber() {
-			assertEquals("Invalid frame number : ", 10, new LastFrame(10).getFrameNumber());
-		}
+
 		
 		//-------------------------------------- LastFrame.setPinDown() --------------------------------------
 		
@@ -523,30 +521,78 @@ public class bowlingTest
 		
 		//------------------------------------- LastFrame.getPinDown(int) ------------------------------------
 		
+		//----------------------------------------------------------------------------------------------------
+		//----------------------------------------------- Game -----------------------------------------------
+		//----------------------------------------------------------------------------------------------------
+		
+		
+		/**
+		 * Test odd game initialization (full NormalFrame)
+		 */
+		@Test (expected = BowlingException.class)
+		public void testGame_FullCreationNormalFrame() {
+			Game g = new Game();
+			for (int i=1; i<11; i++) {
+				g.addFrame(new NormalFrame(i));
+			}			
+		}
+		
+		/**
+		 * Test odd game initialization (full LastFrame)
+		 */
+		@Test (expected = BowlingException.class)
+		public void testGame_CreationFullLastFrame() {
+			Game g = new Game();
+			for (int i=1; i<11; i++) {
+				g.addFrame(new NormalFrame(10));
+			}			
+		}
+		
+		/**
+		 * Test getCumulativeScore return value (-1) for empty game
+		 */
+		@Test
+		public void testGame_CumulativeScoreEmpty() {
+			for (int i=1; i<11; i++) {
+				assertEquals(-1, game.getCumulativeScore(i));
+			}
+		}
+		
+		
+		
 	}
 	
-	//----------------------------------------------------------------------------------------------------
-	//----------------------------------------------- Game -----------------------------------------------
-	//----------------------------------------------------------------------------------------------------
+	/**
+	 * Test class to use parameters to help test the getFrameNumber method
+	 */
 	@RunWith(Parameterized.class)
-	public static class TestGameParameter {
+	public static class ParameterizedTest_getFrameNumber {
 		
-		int entier;
+		public Frame frame;
+		public int expected_num;
 		
-		public TestGameParameter(int i) {
-			entier = i;
+		public ParameterizedTest_getFrameNumber(int i) {
+			if (i == 10)
+				frame = new LastFrame(10);
+			else
+				frame = new NormalFrame(i);
+			expected_num = i;
 		}
 		
 		@Parameters
 		public static Iterable<Object[]> data() throws Throwable {
 			return Arrays.asList(new Object[][] {
-				{1}
+				{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}
 			});
 		}
 		
+		/**
+		 * Test the result of the method Frame.getFrameNumber() for frame 1 to 10
+		 * (frame 1-9 are NormalFrame, frame 10 is LastFrame)
+		 */		
 		@Test
-		public void testParameter() {
-			assertEquals(1, entier);
+		public void test() {
+			assertEquals(expected_num, frame.getFrameNumber());
 		}
 		
 		
