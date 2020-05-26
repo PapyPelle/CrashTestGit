@@ -1,0 +1,88 @@
+<h2>Devoir: L'expert du Sudoku</h2><div id="intro" class="box generalbox boxaligncenter"><div class="no-overflow"><p><img src="https://moodle.uqac.ca/pluginfile.php/398441/mod_assign/intro/sudoku-clipart-4.jpg" alt="Sudoku" class="img-responsive atto_image_button_text-bottom" width="168" height="168"></p>
+
+<h3>Objectifs</h3>
+
+<ul>
+<li>Modéliser un problème de résolution de contraintes en formules de logique propositionnelle</li>
+<li>Utiliser un solveur SAT pour générer des données de test respectant ces contraintes</li>
+</ul>
+
+<h3>Contexte</h3>
+
+<p>Microsoft a décidé de remplacer le jeu par défaut dans son système d'exploitation Windows. Plutôt que de fournir le bon vieux Démineur, le futur Windows 30 contiendra plutôt un jeu de sudoku. On rappelle qu'un sudoku est une grille de taille 9×9 dans laquelle on doit placer exactement un chiffre entre 0 et 9 dans chacune des cases. Un problème sudoku possède généralement un certain nombre de cases pré-remplies, comme ci-dessous:</p>
+
+<img src="https://moodle.uqac.ca/pluginfile.php/398441/mod_assign/intro/sudoku.png" alt="Grille de sudoku" class="img-responsive atto_image_button_text-bottom" width="386" height="308">
+
+<p>Le joueur cherche à compléter la grille selon les conditions suivantes:</p>
+
+<ol>
+<li>Chaque case ne peut contenir qu’un seul chiffre</li>
+<li>Chaque chiffre doit apparaître exactement une fois dans chaque ligne de la grille</li>
+<li>Chaque chiffre doit apparaître exactement une fois dans chaque colonne de la grille</li>
+<li>Chaque chiffre doit apparaître exactement une fois dans chacune des neuf sous-grilles de taille 3×3</li>
+</ol>
+
+<p>Vous êtes en charge de tester ce logiciel. Plus précisément, vous devez vous assurer que le jeu ne propose que des grilles pour lesquelles il existe une solution; de plus, un de vos tests doit visiter la partie du code de l'application qui annonce que le joueur a gagné. Mais voilà: comme le jeu ne propose jamais la même grille à chaque exécution, il vous est impossible de simplement coder en dur les données de votre test.</p>
+
+<p>Plutôt que de programmer vous-même un algorithme pour résoudre un sudoku, vous décidez d'encoder le puzzle sous forme d'un problème de satisfaisabilité booléenne.</p>
+
+<h3>Préalables techniques</h3>
+
+<p>Le dépôt <a href="https://github.com/sylvainhalle/stev-booleans"><tt>stev-booleans</tt></a> fournit une librairie Java permettant de créer et de manipuler des formules de logique propostionnelle. Un <a href="https://github.com/sylvainhalle/stev-booleans/blob/master/Source/Core/src/stev/booleans/examples/CnfExample.java">programme d'exemple</a> montre les opérations à effectuer pour créer des formules booléennes, en afficher le contenu, les convertir en forme normale conjonctive, et exporter les clauses sous la forme d'un tableau d'entiers.</p>
+
+<p>De son côté, la librairie <a href="http://www.sat4j.org">Sat4j</a> fournit un solveur SAT écrit en Java. Parmi toutes les archives disponibles, les fichiers JAR dont vous aurez besoin sont contenus dans <a href="http://download.forge.ow2.org/sat4j/sat4j-core-v20130525.zip">cette archive</a>. La <a href="http://www.sat4j.org/howto.php#feeding">page Howto</a> du site de Sat4j donne un exemple de code permettant de créer une instance de solveur et de l'appeler en lui donnant un problème à résoudre.</p>
+
+<p>Comme la plupart des solveurs SAT, celui de Sat4j demande qu'on lui passe une formule en CNF. La manière de représenter cette formule s'appelle le <a href="https://people.sc.fsu.edu/~jburkardt/data/cnf/cnf.html">format DIMACS</a>. Dans ce format, chaque variable est associée à un nombre entier; chaque clause est une liste de nombres correspondant aux variables de la clause; le nombre est négatif si la variable apparaît avec une négation, et positif sinon.</p>
+
+<p>Par exemple, la formule suivante en CNF…</p>
+
+<p>(<i>a</i> ∨ ¬<i>b</i> ∨ <i>c</i>) ∧ (<i>b</i> ∨ ¬<i>c</i> ∨ ¬<i>d</i> ∨ <i>e</i>)</p>
+
+<p>…sera traduite en un tableau comme celui-ci:</p>
+
+<pre>1 -2 3
+2 -3 4 5
+</pre>
+
+<p>Dans cet exemple, la variable <i>a</i> est associée au nombre 1, la variable <i>b</i> au nombre 2, etc.</p>
+
+<p>Le "pont" entre <tt>stev-booleans</tt> et Sat4j se fait au moyen de la méthode <tt>getClauses()</tt>, qui, à partir d'un objet de type <tt>BooleanFormula</tt> mis en CNF, produit une liste de tableaux d'entiers. On passe ces tableaux successivement à la méthode <tt>addClause()</tt> d'un <tt>ISolver</tt> de la librairie Sat4j.</p>
+
+<h3>Instructions</h3>
+
+<p>On vous demande d'écrire un programme Java qui accepte comme entrée un puzzle sudoku, et retourne en sortie une solution au puzzle. Les entrées et les sorties sont représentées sous la forme d'une chaîne de 81 caractères représentant la valeur de chaque case en lisant de gauche à droite et de haut en bas. Le symbole <tt>#</tt> représente une case vide. Ainsi, les deux premières lignes de la grille ci-dessus correspondent à la chaîne <tt>#26###81#3##7#8##6</tt>.</p>
+
+<p>L'entrée doit être donnée via une chaîne de caractères passée dans l'argument <tt>args</tt> de la méthode <tt>main()</tt> du programme. La sortie doit être imprimée dans la console. Un <a href="http://theopentutorials.com/tutorials/java/cmd-line-args/how-to-pass-command-line-arguments-in-eclipse-ide/">court tutoriel</a> explique comment passer des arguments à <tt>main()</tt> dans Eclipse.</p>
+
+<p>Identifiez d'abord les variables propositionnelles nécessaires à la modélisation ainsi que leur signification. Ensuite, modélisez chacune des propriétés 1-4 ci-dessus sous forme de contrainte de logique propositionnelle. Il n'est pas nécessaire d'utiliser la forme normale conjonctive. Finalement, traduisez le contenu de la grille de départ en conditions additionnelles faisant intervenir les variables de votre modélisation.</p>
+
+<h3>Modalités de remise</h3>
+
+<p>Sur la plateforme Moodle du cours, remettez une archive <tt>zip</tt> avec le contenu suivant:</p>
+
+<ul>
+<li>Les fichiers <strong>source</strong> de votre programme</li>
+<li>En commentaire dans l'en-tête du fichier contenant la méthode <strong><tt>main()</tt></strong>: le nom et le <strong>code permanent</strong> de chacun des membres de l'équipe</li>
+</ul>
+
+<h3>Notation</h3>
+
+<p>Les points seront accordés au devoir selon le barème suivant:</p>
+
+<table border="1">
+<tbody><tr>
+<th>Élément</th><th>Points</th>
+</tr>
+<tr><td>Choix des variables propositionnelles</td><td>1</td></tr>
+<tr><td>Modélisation de la propriété 1</td><td>2</td></tr>
+<tr><td>Modélisation de la propriété 2</td><td>2</td></tr>
+<tr><td>Modélisation de la propriété 3</td><td>2</td></tr>
+<tr><td>Modélisation de la propriété 4</td><td>2</td></tr>
+<tr><td>Modélisation du contenu de départ de la grille</td><td>2</td></tr>
+<tr><td>Interaction correcte avec le solveur</td><td>1</td></tr>
+<tr><td>Fonctionnement correct des entrées/sorties</td><td>1</td></tr>
+<tr><td>Conversion de la solution en grille complète</td><td>2</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>15</strong></td></tr>
+</tbody></table>
+
+<p>Un travail qui ne respecte pas les consignes, qui ne compile pas ou qui s'exécute en produisant des erreurs inattendues se verra donner la note de zéro. Il est de la responsabilité de l'étudiant de vérifier les fichiers avant de les remettre.</p></div></div>
