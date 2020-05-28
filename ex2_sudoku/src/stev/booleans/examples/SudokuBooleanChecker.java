@@ -2,6 +2,7 @@ package stev.booleans.examples;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
+import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 
@@ -290,7 +291,11 @@ public class SudokuBooleanChecker {
 		sbc.addVariables(input);
 		try {
 			sbc.solveSudoku();
-		} catch (Exception e) {
+		} catch (ContradictionException e) {
+			//Trivial contradicted solutions are false
+		}
+		catch (Exception e) {
+			//other solutions are still given
 			e.printStackTrace();
 			return;
 		}
