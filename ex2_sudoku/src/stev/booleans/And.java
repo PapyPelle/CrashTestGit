@@ -37,12 +37,18 @@ public class And extends NaryConnective
 		for (int i = 0; i < m_operands.size(); i++)
 		{
 			BooleanFormula bf = m_operands.get(i);
-			if (!(bf instanceof Or))
+			if (bf instanceof Or) {
+				Or o = (Or) bf;
+				clauses[i] = o.toClause(var_dict);
+			}
+			else if (bf instanceof PropositionalVariable) {
+				PropositionalVariable p = (PropositionalVariable) bf;
+				clauses[i] = p.toClause(var_dict);
+			}
+			else
 			{
 				throw new BooleanFormulaException("Formula is not in CNF");
 			}
-			Or o = (Or) bf;
-			clauses[i] = o.toClause(var_dict);
 		}
 		return clauses;
 	}

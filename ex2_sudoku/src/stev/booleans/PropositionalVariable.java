@@ -92,4 +92,15 @@ public class PropositionalVariable extends BooleanFormula
 	{
 		throw new BooleanFormulaException("Formula is not in CNF");
 	}
+	
+	/**
+	 * Gets the DIMACS clause associated to this formula
+	 * @return The DIMACS clause in the form of an array of integers
+	 */
+	protected int[] toClause(Map<String,Integer> var_dict)
+	{
+		int[] clause = new int[1];
+		clause[0] = var_dict.get(m_variableName);
+		return clause;
+	}
 }

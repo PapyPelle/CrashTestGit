@@ -25,7 +25,7 @@ public class SudokuBooleanChecker {
 		for(int i = 0; i < lengthSqr; ++i) {
 			for(int j = 0; j < lengthSqr; ++j) {
 				for(int k = 0; k < lengthSqr; ++k) {
-					String name = "" + (i+1) + (j+1) + (k+1);
+					String name = "r" + (i+1) + "c" + (j+1) + "d" + (k+1);
 					varList[i][j][k] = new PropositionalVariable(name);
 					System.out.println(name);
 				}
@@ -36,7 +36,7 @@ public class SudokuBooleanChecker {
 	}
 	
 	/**
-	 * 
+	 * Return the Xor of the operands, it is evaluated to true iff only one operand is true
 	 * @param operands
 	 * @return a formula corresponding to the Xor of operands
 	 */
@@ -62,7 +62,7 @@ public class SudokuBooleanChecker {
 	/**
 	 * Generate the formula corresponding to having only one digit per cell
 	 */
-	BooleanFormula formula1() {
+	public BooleanFormula formula1() {
 		List<BooleanFormula> results = new ArrayList<BooleanFormula>();
 		List<BooleanFormula> consideredVariables = new ArrayList<BooleanFormula>();
 		for(int i = 0; i < lengthSqr; ++i) {
@@ -80,7 +80,7 @@ public class SudokuBooleanChecker {
 	/**
 	 * Generate the formula corresponding to having each digit on each line
 	 */
-	BooleanFormula formula2() {
+	public BooleanFormula formula2() {
 		List<BooleanFormula> results = new ArrayList<BooleanFormula>();
 		List<BooleanFormula> consideredVariables = new ArrayList<BooleanFormula>();
 		//for each line
@@ -101,7 +101,7 @@ public class SudokuBooleanChecker {
 	/**
 	 * Generate the formula corresponding to having each digit on each column
 	 */
-	BooleanFormula formula3() {
+	public BooleanFormula formula3() {
 		List<BooleanFormula> results = new ArrayList<BooleanFormula>();
 		List<BooleanFormula> consideredVariables = new ArrayList<BooleanFormula>();
 		//for each column
@@ -122,7 +122,7 @@ public class SudokuBooleanChecker {
 	/**
 	 * Generate the formula corresponding to having each digit on each square
 	 */
-	BooleanFormula formula4() {
+	public BooleanFormula formula4() {
 		List<BooleanFormula> results = new ArrayList<BooleanFormula>();
 		List<BooleanFormula> consideredVariables = new ArrayList<BooleanFormula>();
 		//for each square
@@ -144,10 +144,31 @@ public class SudokuBooleanChecker {
 		return new And(results);
 	}
 	
+	/**
+	 * args of format xxxxxxxxxxxxxxxxxxxxxxxxxx where each x is either 1 to 9 or #, lengthSqr ^ 2 x
+	 */
 	public static void main(String[] args) 
 	{
+		String input = args[0];
+		System.out.println(input);
 		SudokuBooleanChecker sbc = new SudokuBooleanChecker();
-		BooleanFormula big_formula = sbc.sudokuFormula;
+		
+		List<BooleanFormula> consideredVariables = new ArrayList<BooleanFormula>();
+		for(int id = 0; id < input.length(); ++id) {
+			char c = input.charAt(id);
+			if(c == '#')
+				continue;
+			else {
+				int k = Character.getNumericValue(c) - 1;
+				int i = id / lengthSqr;
+				int j = id % lengthSqr;
+				consideredVariables.add(new Or(sbc.varList[i][j][k]));
+				System.out.println(id + ": " + c + ", [" + i + ", " + j + ", " + k + "]");
+			}
+		}
+		consideredVariables.add(sbc.sudokuFormula);
+		
+		BooleanFormula big_formula = new And(consideredVariables);
 		// Convert this formula to CNF
 		BooleanFormula cnf = big_formula.toCnf();
 		
@@ -164,6 +185,6 @@ public class SudokuBooleanChecker {
 		
 		// What is the integer associated to variable q?
 		Map<String,Integer> associations = cnf.getVariablesMap();
-		System.out.println("Variable 999 is associated to number " + associations.get("999"));
+		System.out.println("Variable 999 is associated to number " + associations.get("r9c9d9"));
 	}
 }
