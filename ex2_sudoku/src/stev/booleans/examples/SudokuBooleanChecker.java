@@ -18,6 +18,12 @@ import stev.booleans.Not;
 import stev.booleans.Or;
 import stev.booleans.PropositionalVariable;
 
+
+/**
+ * The Sudoku checker class. Also give one possible solution if there is one
+ * @author {Timtohée Corsini , Yann Royant} CORT20069704  ROYY27029808
+ *
+ */
 public class SudokuBooleanChecker {
 	static final int length = 3;
 	static final int lengthSqr = length * length;
@@ -215,7 +221,12 @@ public class SudokuBooleanChecker {
 		solver.setExpectedNumberOfClauses(numClauses);
 		// Add clauses (integers arrays) one by one
 		for (int i=0; i < numClauses; i++) {
-			solver.addClause(new VecInt(clauses[i]));
+			try {
+				solver.addClause(new VecInt(clauses[i]));
+			}
+			catch (ContradictionException e) {
+				return false;
+			}
 		}
 		// Use problem instance to get results
 		IProblem problem = solver;
@@ -251,7 +262,7 @@ public class SudokuBooleanChecker {
 	}
 	
 	/**
-	 * Print sudoku grid solution (if there is one)
+	 * Print Sudoku grid solution (if there is one)
 	 */
 	public void printSolution() {
 		if (solution == null) {
@@ -283,7 +294,7 @@ public class SudokuBooleanChecker {
 			input = args[0];
 		}
 		else {
-			// input = "#26###81#3##7#8##64###5###7#5#1#7#9###39#51###4#3#2#5#1###3###25##2#4##9#38###46#";
+			input = "123456789769138245548792136436219578271845963895673412654321897312987654987564321";
 		}
 		System.out.println("input : " + input);
 		
@@ -291,11 +302,8 @@ public class SudokuBooleanChecker {
 		sbc.addVariables(input);
 		try {
 			sbc.solveSudoku();
-		} catch (ContradictionException e) {
-			//Trivial contradicted solutions are false
 		}
 		catch (Exception e) {
-			//other solutions are still given
 			e.printStackTrace();
 			return;
 		}
