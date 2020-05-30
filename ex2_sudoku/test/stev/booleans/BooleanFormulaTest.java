@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-/*
 import stev.booleans.And;
 import stev.booleans.BooleanFormula;
 import stev.booleans.BooleanFormulaException;
@@ -18,7 +17,6 @@ import stev.booleans.Not;
 import stev.booleans.Or;
 import stev.booleans.PropositionalVariable;
 import stev.booleans.Valuation;
-*/
 
 public class BooleanFormulaTest
 {
@@ -100,50 +98,21 @@ public class BooleanFormulaTest
 	}
 	
 	@Test
-	public void testDistributeOrVarVar()
+	public void testAndOr1()
 	{
-		Or or = new Or(X, Y);
-		BooleanFormula bf = or.distributeAndOr();
-		assertEquals("(x | y)", bf.toString());
+		Implies op = new Implies(P, Q);
+		BooleanFormula bf = op.keepAndOrNot();
+		assertTrue(bf instanceof Or);
+		Or n_op = (Or) bf;
+		assertTrue(n_op.m_operands.get(0) instanceof Not);
+		assertEquals(Q, n_op.m_operands.get(1));
 	}
-	
-	@Test
-	public void testDistributeOrVarAnd()
-	{
-		Or or = new Or(X, new And(Y, Z));
-		BooleanFormula bf = or.distributeAndOr();
-		assertEquals("((x | y) & (x | z))", bf.toString());
-	}
-	
-	@Test
-	public void testDistributeOrAndAnd()
-	{
-		Or or = new Or(new And(X, Y), new And(Z, T));
-		BooleanFormula bf = or.distributeAndOr();
-		assertEquals("((x | z) & (y | z) & (x | t) & (y | t))", bf.toString());
-	}
-	
-	@Test
-	public void testDistributeOrAndVarAnd()
-	{
-		Or or = new Or(new And(X, Y), P, new And(Z, T));
-		BooleanFormula bf = or.distributeAndOr();
-		assertEquals("((x | p | z) & (y | p | z) & (x | p | t) & (y | p | t))", bf.toString());
-	}
-	
-	@Test
-	public void testDistributeOrAndVarNegAnd()
-	{
-		Or or = new Or(new And(X, Y), new Not(P), new And(Z, T));
-		BooleanFormula bf = or.distributeAndOr();
-		assertEquals("((x | !p | z) & (y | !p | z) & (x | !p | t) & (y | !p | t))", bf.toString());
-	}
-	
+		
 	@Test
 	public void testCnf1()
 	{
 		Or or = new Or(new And(X, Y), P, new And(Z, T));
-		BooleanFormula bf = or.toCnf();
+		BooleanFormula bf = BooleanFormula.toCnf(or);
 		assertTrue(bf.isCnf());
 		System.out.println(bf);
 	}
@@ -152,7 +121,7 @@ public class BooleanFormulaTest
 	public void testCnf2()
 	{
 		Or or = new Or(new And(X, Y), P, new And(Z, new Or(T, U)));
-		BooleanFormula bf = or.toCnf();
+		BooleanFormula bf = BooleanFormula.toCnf(or);
 		assertTrue(bf.isCnf());
 		System.out.println(bf);
 	}
@@ -161,7 +130,7 @@ public class BooleanFormulaTest
 	public void testCnf3()
 	{
 		Or or = new Or(new And(X, Y), P, new And(Z, T, U));
-		BooleanFormula bf = or.toCnf();
+		BooleanFormula bf = BooleanFormula.toCnf(or);
 		assertTrue(bf.isCnf());
 		System.out.println(bf);
 	}
@@ -210,5 +179,48 @@ public class BooleanFormulaTest
 		assertEquals(-5, i_cl2[1]);
 		assertEquals(-1, i_cl2[2]);
 		assertEquals(2, i_cl2[3]);
+	}
+	
+	@Test
+	public void testGetClausesAtomic1()
+	{
+		And a = new And(X, new Not(Y));
+		int[][] clauses = a.getClauses();
+		int[] i_cl1 = clauses[0];
+		int[] i_cl2 = clauses[1];
+		assertEquals(1, i_cl1.length);
+		assertEquals(1, i_cl2.length);
+		assertEquals(1, i_cl1[0]);
+		assertEquals(-2, i_cl2[0]);
+	}
+	
+	@Test
+	public void testGetClausesAtomic2()
+	{
+		Or a = new Or(X, new Not(Y));
+		int[][] clauses = a.getClauses();
+		int[] i_cl1 = clauses[0];
+		assertEquals(2, i_cl1.length);
+		assertEquals(1, i_cl1[0]);
+		assertEquals(-2, i_cl1[1]);
+	}
+	
+	@Test
+	public void testGetClausesAtomic3()
+	{
+		Not a = new Not(X);
+		int[][] clauses = a.getClauses();
+		int[] i_cl1 = clauses[0];
+		assertEquals(1, i_cl1.length);
+		assertEquals(-1, i_cl1[0]);
+	}
+	
+	@Test
+	public void testGetClausesAtomic4()
+	{
+		int[][] clauses = X.getClauses();
+		int[] i_cl1 = clauses[0];
+		assertEquals(1, i_cl1.length);
+		assertEquals(1, i_cl1[0]);
 	}
 }

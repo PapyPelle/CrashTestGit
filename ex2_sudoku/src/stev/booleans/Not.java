@@ -1,9 +1,30 @@
+/*
+    Simple manipulation of Boolean formulas
+    Copyright (C) 2020 Sylvain Hallé
+    
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package stev.booleans;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Representation of the logical negation connective.
+ * @author Sylvain Hallé
+ */
 public class Not extends BooleanFormula
 {
 	/*@ non_null @*/ protected BooleanFormula m_operand;
@@ -29,7 +50,26 @@ public class Not extends BooleanFormula
 	@Override
 	public int[][] getClauses()
 	{
-		throw new BooleanFormulaException("Formula is not in CNF");
+		Map<String,Integer> var_dict = getVariablesMap();
+		int[] clause = toClause(var_dict);
+		int[][] clauses = new int[1][];
+		clauses[0] = clause;
+		return clauses;
+	}
+	
+	/**
+	 * Gets the DIMACS clause associated to this formula
+	 * @return The DIMACS clause in the form of an array of integers
+	 */
+	protected int[] toClause(Map<String,Integer> var_dict)
+	{
+		if (!(m_operand instanceof PropositionalVariable))
+		{
+			throw new BooleanFormulaException("Formula is not in CNF");
+		}
+		PropositionalVariable p = (PropositionalVariable) m_operand;
+		int index = var_dict.get(p.m_variableName);
+		return new int[] {-index};
 	}
 	
 	@Override
@@ -111,14 +151,6 @@ public class Not extends BooleanFormula
 	protected Not keepAndOrNot()
 	{
 		return new Not(m_operand.keepAndOrNot());
-	}
-	
-	@Override
-	protected Not distributeAndOr()
-	{
-		// We do nothing, as we assume the formula is already in NNF,
-		// so the only operand inside not is a variable
-		return this;
 	}
 	
 	@Override

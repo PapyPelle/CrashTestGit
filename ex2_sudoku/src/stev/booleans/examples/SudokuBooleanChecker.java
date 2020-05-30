@@ -210,7 +210,7 @@ public class SudokuBooleanChecker {
 		// Create the big formula
 		BooleanFormula big_formula = new And(filledVariables);
 		// Convert this formula to CNF
-		BooleanFormula cnf = big_formula.toCnf();
+		BooleanFormula cnf = BooleanFormula.toCnf(big_formula);
 		// Get solver specifications
 		int numVar = lengthSqr*lengthSqr*lengthSqr;
 		int clauses[][] = cnf.getClauses();
@@ -221,6 +221,7 @@ public class SudokuBooleanChecker {
 		solver.setExpectedNumberOfClauses(numClauses);
 		// Add clauses (integers arrays) one by one
 		for (int i=0; i < numClauses; i++) {
+			
 			try {
 				solver.addClause(new VecInt(clauses[i]));
 			}
@@ -295,6 +296,8 @@ public class SudokuBooleanChecker {
 		}
 		else {
 			input = "123456789769138245548792136436219578271845963895673412654321897312987654987564321";
+			// input = "11###############################################################################";
+			// input = "123456789########################################################################";
 		}
 		System.out.println("input : " + input);
 		

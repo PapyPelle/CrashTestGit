@@ -1,9 +1,30 @@
+/*
+    Simple manipulation of Boolean formulas
+    Copyright (C) 2020 Sylvain Hallé
+    
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package stev.booleans;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Representation of the logical conjunction connective.
+ * @author Sylvain Hallé
+ */
 public class And extends NaryConnective
 {
 	public And(/*@ non_null @*/ List<BooleanFormula> operands)
@@ -37,17 +58,24 @@ public class And extends NaryConnective
 		for (int i = 0; i < m_operands.size(); i++)
 		{
 			BooleanFormula bf = m_operands.get(i);
-			if (bf instanceof Or) {
+			if (!bf.isClause())
+			{
+				throw new BooleanFormulaException("Formula is not in CNF");
+			}
+			if (bf instanceof Or)
+			{
 				Or o = (Or) bf;
 				clauses[i] = o.toClause(var_dict);
 			}
-			else if (bf instanceof PropositionalVariable) {
-				PropositionalVariable p = (PropositionalVariable) bf;
-				clauses[i] = p.toClause(var_dict);
-			}
-			else
+			else if (bf instanceof Not)
 			{
-				throw new BooleanFormulaException("Formula is not in CNF");
+				PropositionalVariable p = (PropositionalVariable) ((Not) bf).m_operand;
+				clauses[i] = new int[] {-var_dict.get(p.m_variableName)};
+			}
+			else if (bf instanceof PropositionalVariable)
+			{
+				PropositionalVariable p = (PropositionalVariable) bf;
+				clauses[i] = new int[] {var_dict.get(p.m_variableName)};
 			}
 		}
 		return clauses;
@@ -137,18 +165,6 @@ public class And extends NaryConnective
 		if (new_list.size() == 1)
 		{
 			return new_list.get(0);
-		}
-		return new And(new_list);
-	}
-	
-	@Override
-	protected And distributeAndOr()
-	{
-		
-		List<BooleanFormula> new_list = new ArrayList<BooleanFormula>(m_operands.size());
-		for (BooleanFormula f : m_operands)
-		{
-			new_list.add(f.distributeAndOr());
 		}
 		return new And(new_list);
 	}
