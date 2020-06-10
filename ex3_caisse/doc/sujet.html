@@ -1,0 +1,109 @@
+<div role="main" id="yui_3_17_2_1_1591817094029_75"><span id="maincontent"></span><h2>Devoir: Panique au Kwik-E-Mart</h2><div id="intro" class="box generalbox boxaligncenter"><div class="no-overflow" id="yui_3_17_2_1_1591817094029_74"><p id="yui_3_17_2_1_1591817094029_73">
+<img src="https://moodle.uqac.ca/pluginfile.php/398450/mod_assign/intro/Kwik-e-mart.jpg" alt="Kwik-E-Mart" role="presentation" class="img-responsive atto_image_button_text-bottom" width="600" height="337">
+</p>
+
+<p>En tant que représentant de l'entreprise NCCR, fabricant de caisses enregisteuses, le gérant du dépanneur <i>Kwik-E-Mart</i> vous appelle de Springfield afin de l'aider à régler un grave problème. La caisse de son dépanneur s'est détraquée et ne donne plus les bons totaux aux clients!</p>
+
+<p>Vous vous rendez sur place et constatez qu'il n'y a qu'une seule caisse au comptoir, et que celle-ci doit être alimentée en rouleaux de papier pour pouvoir être utilisée. Or, la quantité de rouleaux disponibles est limitée: vous devrez donc être parcimonieux dans les tests que vous choisirez d'exécuter.</p>
+
+<h3>Contexte</h3>
+
+<p>Avant de vous lancer dans les tests, le gérant vous explique le fonctionnement des ventes au <i>Kwik-E-Mart</i>.</p>
+
+<ul>
+<li>Une liste d'emplettes est un objet <tt>List</tt> dont les éléments sont des objets <tt>Item</tt>. Un item possède un <a href="https://fr.wikipedia.org/wiki/Code_universel_des_produits">code universel de produit</a> (CUP, ou <i>UPC</i> en anglais), une courte description textuelle, une quantité et un prix unitaire.</li>
+<li>La caisse est un objet <tt>Register</tt>, dont la méthode statique <tt>print()</tt> qui prend en entrée une liste d'emplette et imprime un reçu de caisse sur un rouleau de papier (<tt>PaperRoll</tt>, dont on reparlera plus tard). La caisse lit et imprime les lignes correspondant aux items un à un, du premier jusqu'au dernier. Elle calcule ensuite le sous-total, applique les taxes, les rabais et les coupons, puis affiche le grand total.</li>
+<li>La caisse vérifie que chaque item ait un CUP valide, soit une chaîne de 12 chiffres dont le dernier, la <strong>clé de contrôle</strong> (<i>check digit</i>), est déterminée par la valeur des 11 autres. La classe <tt>Upc</tt> possède une méthode <tt>getCheckDigit()</tt> qui permet de calculer ce numéro à partir des 11 premiers caractères d'une chaîne.</li>
+<li>Le dépanneur ne vend rien dont le prix unitaire est supérieur à 35$; la caisse arrête l'impression d'une facture si un des items dépasse ce prix.</li>
+<li>De la même manière, les montants négatifs sont également interdits.</li>
+<li>Des items peuvent avoir une quantité fractionnaire --par exemple, des marchandises vendues au poids. Comme le stipule la norme CUP, ces produits ont toujours un code commençant par <strong>2</strong> et la caisse rejette les items contrevenant à cette convention.</li>
+<li>On ne peut saisir deux fois un item avec le même CUP. Cependant, la caisse nous permet de mettre dans la liste un item avec une quantité <strong>négative</strong>, ce qui a pour effet d'annuler l'ajout antérieur de cet item. Cette opération n'est permise que si l'item à annuler a d'abord été ajouté (i.e. apparaît dans une position antérieure de la liste d'emplettes).</li>
+<li>La caisse rejette les listes d'emplettes vides, et accepte un maximum de <strong>10</strong> entrées (incluant les items à quantité négative).</li>
+</ul>
+
+<p>La caisse permet également de gérer certains <strong>rabais</strong> offerts aux clients. Ces rabais sont appliqués une fois la liste de tous les items traitée.</p>
+
+<ul>
+<li>Si un client achète 5 items <em>distincts</em> (i.e. CUP différents) et que le total avant taxes de ses achats est d'au moins 2$, un rabais de 1$ est appliqué à sa facture.</li>
+<li>Un client peut également faire scanner un ou plusieurs <em>coupons</em>; la caisse les reconnaît à leur CUP, qui commence par <strong>5</strong>. On ne peut appliquer qu'un seul coupon avec un CUP donné; le montant du coupon est <strong>positif</strong>, et il est soustrait du total des achats. Si le total, au moment de traiter le coupon, est inférieur au montant du coupon, celui-ci n'est pas appliqué et la caisse passe au coupon suivant. Les coupons sont autrement soumis aux mêmes règles que les autres items en ce qui concerne les doublons et l'ajout/retrait des emplettes.</li>
+</ul>
+
+<p>L'extrait suivant donne un exemple de coupon de caisse:</p>
+
+<pre>------------------------------------------
+KWIK-E-MART SPRINGFIELD
+Mon 04/06/2020 01:30:22
+
+123456789012 Bananas x 1            1.50$
+228049185001 Beef 0.50 @  5.75$     2.88$
+123456789012 Bananas x -1          -1.50$
+647481195995 Chewing gum x 2        1.98$
+443482259960 Gobstoppers x 1        0.99$
+343234323430 Nerds x 2              2.88$
+615193141593 Doritos x 1            1.25$
+SUB-TOTAL                           9.98$
+
+Tax SGST 5%                         0.50$
+543234323434 Coupon: Doritos Club  -0.50$
+Rebate for 5 items                 -1.00$
+TOTAL                               8.97$
+------------------------------------------
+</pre>
+
+<p>On peut voir d'abord la liste des items, avec pour chacun le CUP, la description, la quantité et le prix. Pour les items vendus au poids, le prix unitaire est également affiché après le symbole "<tt>@</tt>". Dans cette facture, les bananes ajoutées à la ligne 1 sont ensuite retirées à la ligne 3.</p>
+
+<p>Après l'affichage du sous-total, la taxe de Springfield de 5% est ajoutée, suivi de la liste des rabais applicables. Ici, un coupon de 0.50$ a été saisi (sa valeur est positive, mais elle est affichée avec le signe "<tt>-</tt>" pour montrer qu'il s'agit d'un rabais). Dans ce cas-ci, le client ayant acheté plus de 5 items, un rabais additionnel de 1$ est appliqué. Le total est ensuite affiché.</p>
+
+<h3>Utilisation de la caisse</h3>
+
+<p>Le système de la caisse est implémenté sous la forme d'une librairie Java appelée <tt>kwikemart-register.jar</tt>, fournie avec l'énoncé du devoir. Cette librairie contient également la documentation Javadoc décrivant chaque classe et chaque méthode. Vous pouvez l'ouvrir dans Eclipse en suivant la technique déjà vue.</p>
+
+<p>Dans les fichiers joints à ce devoir se trouve <tt>RegisterDemo.java</tt>, qui montre un exemple simple d'utilisation de la caisse. On y remarque les éléments suivants:</p>
+
+<ul>
+<li>Comme le mentionne l'énoncé, il n'y a qu'une seule caisse, et donc une seule instance possible de la classe <tt>Register</tt>. On obtient cette instance en utilisant la méthode statique <tt>getRegister()</tt>. Les appels à cette méthode retournent toujours le même objet, et il n'est pas possible de construire de nouvelles instances de la classe <tt>Register</tt>.</li>
+<li>Pour fonctionner, on doit donner à la caisse un rouleau de papier, soit un objet de la classe <tt>PaperRoll</tt>, au moyen de la méthode <tt>changePaper()</tt>. On ne peut construire soi-même d'instances de cette classe: il n'y a que deux rouleaux de papier disponibles, soit les instances désignées par <tt>PaperRoll.SMALL_ROLL</tt> et <tt>PaperRoll.LARGE_ROLL</tt>. Le premier permet d'imprimer 25 lignes, et le second 1000 lignes. Une fois le nombre de lignes épuisé, chaque rouleau n'accepte plus que l'on imprime dessus. Comme on ne peut créer de nouvelles instances de ces objets, cela signifie que le nombre de lignes que la caisse peut imprimer pour la durée d'une exécution est limité. On peut le constater dans le programme d'exemple: après que la caisse se soit fait donner le "petit" rouleau, elle peut imprimer la première facture mais lance une <tt>OutOfPaperException</tt> au moment d'imprimer la seconde. </li>
+<li>Comme on l'a déjà dit, une liste d'emplettes est un objet <tt>List</tt> contenant des objets de la classe <tt>Item</tt>. On crée chaque item en utilisant le constructeur, qui prend un code UPC, une description textuelle, une quantité et un prix unitaire. Aucune vérification n'est faite sur la validité des arguments dans le constructeur: ceci n'est fait qu'au moment de l'impression d'une facture.</li>
+<li>C'est la méthode <tt>print()</tt> de la classe <tt>Register</tt> qui produit la facture; chacune des lignes du reçu est imprimée sur le rouleau de papier. En imprimant le reçu, si une des conditions mentionnées à la section précédente n'est pas respectée, la caisse lance une exception. Par exemple, <tt>InvalidCheckDigitException</tt> est lancée si l'un des items de la liste d'emplettes contient un CUP dont la clé de contrôle est invalide.</li>
+</ul>
+
+<h3>Tester la caisse</h3>
+
+<p>Étant donné la quantité limitée de papier, vous choisissez d'utiliser la technique de <strong>partitionnement en classes d'équivalence</strong> (PCE) afin de générer un petit nombre de cas de test représentatifs. Dans ce cas-ci, l'espace des données d'entrée consiste en l'ensemble de toutes les valeurs <tt>x</tt> que l'on peut donner comme argument à la méthode <tt>print(x)</tt> (donc des listes d'emplettes). L'objectif du travail n'est pas de trouver des bugs dans la caisse (bien qu'il en reste!), mais plutôt d'utiliser correctement la technique PCE pour choisir les cas de test à appliquer.</p>
+
+<p>Étant donné que vous effectuez des tests de type "boîte noire", voici quelques pistes afin de vous aider à déterminer quelles entrées sont traitées de manière différente par la caisse:</p>
+
+<ul>
+<li>Avant de commencer, pour bien comprendre le fonctionnement de la caisse, expérimentez l'interaction avec la classe en programmant différents cas de figure manuellement.</li>
+<li>Pensez à toutes les exceptions que peut lancer un appel à <tt>print()</tt>: ceci inclut les exceptions documentées par la librairie (donc tous les descendants de <tt>StoreException</tt>), mais aussi toute autre exception que des arguments donnés à la méthode pourraient raisonnablement provoquer. On peut considérer que chaque exception différente correspond à un traitement différent.</li>
+<li>Ne considérez pas que les erreurs: n'oubliez pas que la description du contexte décrit également plusieurs cas de figure valides différents: rabais, coupons, items retirés, etc.
+</li></ul>
+
+<h3>Livrable</h3>
+
+<p>Sur le site Moodle du cours, remettez:</p>
+
+<ul>
+<li>Un <strong>unique</strong> fichier Java, appelé <tt>RegisterTest.java</tt>, contenant:
+<ul>
+<li>En commentaire au début du fichier, la liste des classes d'équivalence que vous avez déterminées; si vous avez utilisé une heuristique pour créer une classe, nommez cette heuristique.</li>
+<li>La suite de tests que vous avez créée. Chacun des cas de test doit être précédé d'un <strong>commentaire Javadoc</strong> décrivant la combinaison de classes d'équivalence visée par ce test ET le résultat attendu. En suivant la notation des diapositives du cours sur la technique PCE, chaque commentaire représente donc une ligne du grand tableau de tests.</li>
+</ul>
+</li>
+</ul>
+
+<h3>Notation</h3>
+
+<p>Les points seront accordés au devoir selon le barème suivant:</p>
+
+<table border="1">
+<tbody><tr>
+<th>Élément</th><th>Points</th>
+</tr>
+<tr><td>Contraintes de papier respectées</td><td>2</td></tr>
+<tr><td>Classes d'équivalence appropriées</td><td>15</td></tr>
+<tr><td>Combinaison des classes en tests</td><td>13</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>30</strong></td></tr>
+</tbody></table>
+
+<p>Un travail qui ne respecte pas les consignes, qui ne compile pas ou qui s'exécute en produisant des erreurs inattendues se verra donner la note de zéro. Il est de la responsabilité de l'étudiant de vérifier le fichier avant de le remettre.</p></div><div id="assign_files_tree5ee13386eb7d01"></div>
