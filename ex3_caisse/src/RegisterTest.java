@@ -22,9 +22,11 @@
  * -- Quantité (q) --
  * 
  * (d1) q = 1
- * (d2) q > 0
- * (d3) q < 0
- * (d4) q = 0
+ * (d2) q > 1
+ * (d3) q in ]0,1[
+ * (d4) q < 0
+ * (d5) q = 0
+ *
  * 
  * (e1) q entière
  * (e2) q fractionnaire
@@ -36,10 +38,11 @@
  * (v1) 1 item
  * (v2) 2 items CUP similaires
  * (v3) [3,10] items CUP similaires
- * (v4) [2-4] items CUP différents
- * (v5) [5-10] items CUP différents
- * (v6) 11+ items
- *
+ * (v4) [2-4]  articles CUP différents
+ * (v5) [5-10] articles CUP différents
+ * (v6) [6-10] coupons CUP différents
+ * (v7) 11+ items
+ * 
  */
 
 import java.util.ArrayList;
@@ -204,38 +207,66 @@ public class RegisterTest {
 		double price = cent/(double)100;
 		
 		// --------- Création du prix ---------
-		// (arbitraire : on ne dépasse pas 100 objets, on considère une précision de 1/1000 en fractionnaire)
-		int MAX_QUANT = 100; // (jamais atteinte)
+		// (arbitraire : on ne dépasse pas 10 objets (ou 10* en fraction), on considère une précision de 1/1000 en fractionnaire)
+		int MAX_QUANT = 10; // (jamais atteinte)
 		int PRECISION = 1000;
-		int quantCent = 0;
-		switch (d) {
-			case 1:
-				quantCent = PRECISION; // à tester que java fasse pas n'importe quoi en conversion
-				break;
-			case 2:
-				quantCent = rand.nextInt(MAX_QUANT*PRECISION -1) + 1; // [1, max[
-				break;
-			case 3:
-				quantCent = (-1)*(rand.nextInt(MAX_QUANT*PRECISION -1) + 1); // ]-max, -1]
-				break;
-			case 4:
-				quantCent = 0;
-				break;
-			default:
-				System.out.println("generateItem paramter 'd' used wrong (" + d +")");
-				return null;
-		}
-		// Quantité finale
 		double quantity = 0;
 		if (e == 1) {
-			quantity = (int) (quantCent/(double)PRECISION);
+			switch (d) {
+				case 1:
+					// Rien à faire pour l'instant
+					break;
+				case 2:
+					quantity = rand.nextInt(MAX_QUANT - 2) + 2; // [2, max[
+					break;
+				case 3:
+					System.out.println("generateItem you can't be integer and inside ]0,1[");
+					return null;
+				case 4:
+					quantity = (-1)*rand.nextInt(MAX_QUANT - 1) + 1; // ]-max, -1]
+					break;
+				case 5:
+					// Rien à faire pour l'instant
+					break;
+				default:
+					System.out.println("generateItem paramter 'd' used wrong (" + d +")");
+					return null;
+			}
 		}
 		else if (e == 2) {
+			int quantCent = 0;
+			switch (d) {
+				case 1:
+					// Rien à faire pour l'instant
+					break;
+				case 2:
+					quantCent = rand.nextInt(MAX_QUANT*PRECISION - PRECISION - 1) + PRECISION + 1; // ]1, max[
+					break;
+				case 3:
+					quantCent = rand.nextInt(PRECISION-1) + 1; // ]0,1[
+					break;
+				case 4:
+					quantCent = (-1)*(rand.nextInt(MAX_QUANT*PRECISION -1) + 1); // ]-max, -1]
+					break;
+				case 5:
+					// Rien à faire pour l'instant
+					break;
+				default:
+					System.out.println("generateItem paramter 'd' used wrong (" + d +")");
+					return null;
+			}
 			quantity = (quantCent/(double)PRECISION);
 		}
 		else {
 			System.out.println("generateItem paramter 'e' used wrong (" + e +")");
 			return null;
+		}
+		// Valeurs entières de d
+		if (d == 1) {
+			quantity = 1;
+		}
+		else if (d == 5) {
+			quantity = 0;
 		}
 		
 		// Création de l'objet final
@@ -261,7 +292,9 @@ public class RegisterTest {
 	
 	// -------------------------------------------------------------------------------------------------
 	
-	
+	/**
+	 * Test utilisant le petit rouleau utilisant toutes les classes ne devant pas générer d'exceptions
+	 */
 	public static void AllOkTest() {
 		List<Item> grocery = new ArrayList<Item>();
 		// item unique
@@ -287,14 +320,19 @@ public class RegisterTest {
 	
 
 	public static void main(String[] args) {
-		if (args.length > 0) {
-			// TODO change randomizer seed ?
-		}
+		// Initialisation de la seed
+		long seed = rand.nextLong();
+		// Décommenter et changer cette ligne si on veut reproduire le même test
+		// seed = 962738903477909273L;
+		rand.setSeed(seed);
+		System.out.println("starting tests with seed : " + seed);
+		// Initialisation de la machine
 		register = Register.getRegister();
+		// Tests
 		register.changePaper(PaperRoll.SMALL_ROLL);
 		AllOkTest();
 		register.changePaper(PaperRoll.LARGE_ROLL);
-		
+		// etc...
 	
 	}
 
