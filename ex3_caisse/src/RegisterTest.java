@@ -69,7 +69,7 @@ public class RegisterTest {
 		// Initialisation de la seed
 		// On aura toujours le même test avec la même seed
 		Long seed = rand.nextLong();
-		// seed = 593728901409953309L;
+		// seed = -6372292149749056015L;
 		rand.setSeed(seed);
 		System.out.println("starting tests with seed : " + seed);
 	}
@@ -82,8 +82,7 @@ public class RegisterTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
-	}
+	public void tearDown() throws Exception {}
 	
 	// -------------------------------------------------------------------------------------------------
 	
@@ -285,6 +284,8 @@ public class RegisterTest {
 					System.out.println("generateItem paramter 'd' used wrong (" + d +")");
 					return null;
 			}
+			if (quantCent % PRECISION == 0)
+				quantCent += 1; // enlève manuellement la chance d'obtenir un entier
 			quantity = (quantCent/(double)PRECISION);
 		}
 		else {
@@ -322,7 +323,7 @@ public class RegisterTest {
 
 	
 	// -------------------------------------------------------------------------------------------------
-	// taille 3+
+	// Taille 3+
 	
 	/**
 	 * Test utilisant le petit rouleau avec plusieurs entrées ne devant pas générer d'exceptions
@@ -333,7 +334,7 @@ public class RegisterTest {
 	 * (a1 b3 c1 d1 e1) coupon
 	 * (a1 b1 c1 d2 e1)	article quantité multiple entière
 	 * (a1 b3 c1 d1 e1) 2e coupon différent après article
-	 * (v5) Liste de plus de 5 articles différents avec 2 coupons -> réduction attendue (TODO comment on test?)
+	 * (v5) (on ne teste pas l'apparition de la ligne de réduction)
 	 */
 	@Test
 	public void Test_ManyGoodUses_noExceptions() {
@@ -342,13 +343,96 @@ public class RegisterTest {
 		grocery.add(generateItem("Savon",		1, 1, 1, 1, 1));
 		grocery.add(generateItem("Tomates",		1, 2, 1, 2, 2));
 		grocery.add(generateItem("Truc cher",	1, 1, 5, 1, 1));
-		Item couches = generateItem("Couches",	1, 1, 1, 1, 1);
-		grocery.add(couches);
-		grocery.add(generateSameItem(couches, (-1)*couches.getQuantity()));
+		Item toRemove = generateItem("Couches",	1, 1, 1, 1, 1);
+		grocery.add(toRemove);
+		grocery.add(generateSameItem(toRemove, (-1)*toRemove.getQuantity()));
 		grocery.add(generateItem("Super reduc",	1, 3, 1, 1, 1));
 		grocery.add(generateItem("Thon cons",	1, 1, 1, 2, 1));
 		grocery.add(generateItem("Naze reduc",	1, 3, 1, 1, 1));
-		register.print(grocery);		
+		String out = register.print(grocery);
+	}
+	
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests sur la reduction spéciale
+	
+	/**
+	 * Test d'une liste de 5 à 10 items qui devrait afficher la réduction spéciale
+	 */
+	@Test
+	public void Test_SpecialReduction_5itemsOrMore() {
+		List<Item> grocery = new ArrayList<Item>();
+		// pour être sur d'avoir un total > 2
+		grocery.add(generateItem("Truc cher", 1, 1, 5, 1, 1));
+		// on ajoute jusqu'à 5 items
+		for (int i=0; i < 4; i++) {
+			grocery.add(generateItem("S"+i+"von", 1, 1, 1, 1, 1));
+		}
+		// On ajoute en plus entre 0 et 5 items
+		for(int i=0; i < rand.nextInt(6); i++) {
+			grocery.add(generateItem("S"+(i+4)+"von", 1, 1, 1, 1, 1));
+		}
+		String registerOut = register.print(grocery);
+		// System.out.print(registerOut);
+		assertTrue(registerOut.contains("Rebate for 5 items"));
+	}
+	
+	/**
+	 * Test d'une liste de 5 items -1 item qui ne devrait pas afficher de réduction spéciale
+	 * (le client n'achète que 4 items distincts)
+	 */
+	@Test
+	public void Test_NoSpecialReduction_5items_1removed() {
+		Item maxPrice1  = generateItem("Truc cher", 1, 1, 5, 1, 1); // pour être sur d'être total > 2
+		Item normal2    = generateItem("S1von",	    1, 1, 1, 1, 1);
+		Item normal3    = generateItem("S2von",	    1, 1, 1, 1, 1);
+		Item normal4    = generateItem("S3von",	    1, 1, 1, 1, 1);
+		Item normal5    = generateItem("S4von",	    1, 1, 1, 1, 1);
+		Item normal5Neg = generateSameItem(normal5, (-1)*normal5.getQuantity());
+		List<Item> grocery = new ArrayList<Item>();
+		grocery.add(maxPrice1);
+		grocery.add(normal2);
+		grocery.add(normal3);
+		grocery.add(normal4);
+		grocery.add(normal5);
+		grocery.add(normal5Neg);
+		String registerOut = register.print(grocery);
+		// System.out.print(registerOut);
+		assertFalse(registerOut.contains("Rebate for 5 items"));
+	}
+	
+	/**
+	 * Test d'une liste de 5 items dont le total est inférieur à 2$ 
+	 */
+	@Test
+	public void Test_NoSpecialReduction_5item_veryLowPrice() {
+		List<Item> grocery = new ArrayList<Item>();
+		for (int i=0; i < 5; i++) {
+			Item tmp = generateItem(i+"tem",1,1,1,1,1); // crée cup unique
+			grocery.add(new Item(tmp.getUpc(), tmp.getDescription(), 1, 0.01));
+		}
+		String registerOut = register.print(grocery);
+		// System.out.print(registerOut);
+		assertFalse(registerOut.contains("Rebate for 5 items"));
+	}
+	
+	/**
+	 * Test d'une liste de 4 items -1 item qui ne devrait pas afficher de réduction spéciale
+	 * (le client n'achète que 3 items distincts, mais 5 lignes d'articles apparaissent)
+	 */
+	@Test
+	public void Test_NoSpecialReduction_4items_1removed() {
+		Item item    = generateItem("S4von",	    1, 1, 1, 1, 1);
+		Item itemNeg = generateSameItem(item, (-1)*item.getQuantity());
+		List<Item> grocery = new ArrayList<Item>();
+		grocery.add(generateItem("Truc cher", 1, 1, 5, 1, 1)); // pour être sur d'être total > 2
+		grocery.add(generateItem("S1von",	    1, 1, 1, 1, 1));
+		grocery.add(generateItem("S2von",	    1, 1, 1, 1, 1));
+		grocery.add(item);
+		grocery.add(itemNeg);
+		String registerOut = register.print(grocery);
+		// System.out.print(registerOut);
+		assertFalse(registerOut.contains("Rebate for 5 items"));
 	}
 	
 	// -------------------------------------------------------------------------------------------------
