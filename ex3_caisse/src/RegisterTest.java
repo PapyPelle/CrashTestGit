@@ -393,6 +393,142 @@ public class RegisterTest {
 	//   Taille 2
 	
 	// TODO : essayer de lever toutes les exceptions de la doc de toute les manières différents
-
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests a2
+	
+	/**
+	 * Item avec CUP invalide (a2, b1, c1, d2, e1)
+	 * (la simple utilisation d'un élément de la classe a2 doit lever une exception,
+	 * seul test utilisant a2)
+	 */
+	@Test (expected = InvalidUpcException.class) 
+	public void TestInvalidUPC() {
+		Item badOne = generateItem("InvalidUPC", 2, 1, 1, 2, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests c2
+	
+	/**
+	 * Test d'ajout d'un item au prix négatif (a1, b1, c2, d1, e1) -> v1
+	 */
+	@Test (expected = AmountException.NegativeAmountException.class)
+	public void TestNegativeItemCost() {
+		Item badOne = generateItem("NegCost", 1, 1, 2, 1, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Test d'un coupon à coût négatif (a1, b1, c1, d2, e1) + (a1, b3, c2, d1, e1) -> v3
+	 */
+	@Test (expected = AmountException.NegativeAmountException.class)
+	public void TestNegativeVoucher() {
+		Item entry = generateItem("Test", 1, 1, 1, 2, 1);
+		Item badOne = generateItem("Coupon", 1, 3, 2, 1, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(entry);
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests c3
+	
+	/**
+	 * Test prix supérieur à 35$ (a1, b1, c3, d2, e1) -> v1
+	 */
+	@Test (expected = AmountException.AmountTooLargeException.class)
+	public void TestTooHighPriceItem() {
+		Item badOne = generateItem("TooExpensive", 1, 1, 3, 2, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Test prix supérieur à 35$ pour objet à quantité fractionnaire 
+	 * (a1, b2, c3, d2, e2) -> v1
+	 */
+	@Test (expected = AmountException.AmountTooLargeException.class)
+	public void TestTooHighPriceItemFrac() {
+		Item badOne = generateItem("TooExpensive", 1, 2, 3, 2, 2);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Test prix supérieur à 35$ pour un coupon 
+	 * (a1, b3, c3, d1, e1) -> v1
+	 */
+	@Test (expected = AmountException.AmountTooLargeException.class)
+	public void TestTooHighPriceVoucher() {
+		Item badOne = generateItem("TooExpensive", 1, 3, 3, 1, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests v2
+	
+	/**
+	 * Deux fois le même CUP en quantité positive 2*(a1, b1, c1, d1, e1) -> v2
+	 */
+	@Test (expected = Register.DuplicateItemException.class)
+	public void TestSameUPCTwice() {
+		Item entry = generateItem("Test", 1, 1, 1, 2, 1);
+		Item copy = generateSameItem(entry, 2);
+		List<Item> list = new ArrayList<Item>();
+		list.add(entry);
+		list.add(copy);
+		register.print(list);
+	}
+	
+	/**
+	 * Test de deux fois le meme coupon 2*(a1, b3, c1, d2, e1) -> v2
+	 */
+	@Test (expected = CouponException.class)
+	public void TestSameCouponTwice() {
+		Item entry = generateItem("Test", 1, 1, 1, 2, 1);
+		Item coupon = generateItem("Coupon", 1, 3, 1, 2, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(entry);
+		list.add(coupon);
+		register.print(list);
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests !b2 et e2
+	
+	/**
+	 * Ajout d'un item à quantité fractionnaire avec un CUP ne commençant pas par 2 ou 5
+	 * (a1, b1, c1, d3, e2) -> v1
+	 */
+	@Test (expected = InvalidQuantityException.class)
+	public void TestFracFirstUPCNot2() {
+		Item badOne = generateItem("Frac", 1, 1, 1, 3, 2);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Ajout d'un item à quantité fractionnaire avec un CUP commençant par 5
+	 * (a1, b3, c1, d3, e2) -> v1
+	 */
+	@Test (expected = InvalidQuantityException.class)
+	public void TestFracFirstUPC5() {
+		Item badOne = generateItem("Frac", 1, 3, 1, 3, 2);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
 }
 
