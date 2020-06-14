@@ -1,16 +1,3 @@
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import stev.kwikemart.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 /**
  * Caractéristiques possibles d'un item (article ou coupon) :
  * 
@@ -51,46 +38,31 @@ import org.junit.Test;
  * (v1) 1 item
  * (v2) 2 items CUP similaires
  * (v3) [3,10] items CUP similaires
- * (v4) [2-10] items CUP différents avec nombre articles < 5
- * (v5) [2-10] items CUP différents avec nombre articles >= 5
- * (v6) 11+ items
+ * (v4) [2-4]  articles CUP différents
+ * (v5) [5-10] articles CUP différents
+ * (v6) [6-10] coupons CUP différents
+ * (v7) 11+ items
  * 
  */
-public class RegisterTest {
-	
-	private static Random rand;
-	private static Register register;
-	
-	// -------------------------------------------------------------------------------------------------
-	
-	@BeforeClass
-	public static void setUpBeforeClass () {
-		rand = new Random();
-		// Initialisation de la seed
-		// On aura toujours le même test avec la même seed
-		Long seed = rand.nextLong();
-		// seed = 593728901409953309L;
-		rand.setSeed(seed);
-		System.out.println("starting tests with seed : " + seed);
-	}
-	
-	@Before
-	public void setUp() throws Exception {
-		// Initialisation de la machine
-		register = Register.getRegister();
-		register.changePaper(PaperRoll.LARGE_ROLL); // Large roll par défaut
-	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import stev.kwikemart.*;
+
+
+public class OldRegisterTest {
+	
+	private static Random rand = new Random(); // TODO add a seed
+	public static Register register;
 	
 	// -------------------------------------------------------------------------------------------------
 	
-	// On ne peut pas générer totalement aléatoirement l'upc, on pourrait retomber sur le même lors d'un test
+	// On ne peut pas générer aléatoirement l'upc, on pourrait retomber sur le même lors d'un test
 	// On crée donc une base de milieux d'upc, obtenus avec la méthode rand et une vérification par nous-même
 	// qu'il n'y ai pas de duplication. Le début et la fin est toujours 0, que l'on définit plus tard
-	private int upcIndice = 0;
+	private static int upcIndice = 0;
 	private static char[][] middleUpc = new char[][]{ // [11], [12]
 			{'0','5','4','2','5','4','4','7','7','2','8','0',},
 			{'0','4','6','5','6','1','4','6','1','9','5','0',},
@@ -131,10 +103,8 @@ public class RegisterTest {
 	/**
 	 * Remet à 0 le générateur de cup
 	 * Appeler cette méthode à la fin de la création d'une liste
-	 * Inutile en JUNIT si on ne fait pas des tests trop gros puisqu'on est censé utiliser
-	 * une instance différente pour chaque test
 	 */
-	private void resetMiddleUpc() {
+	private static void resetMiddleUpc() {
 		upcIndice = 0;
 	}
 	
@@ -142,7 +112,7 @@ public class RegisterTest {
 	 * Permet de générer des codes CUP "aléatoires" distincts
 	 * @return un tableau de char
 	 */
-	private char[] getMiddleUpc() {
+	private static char[] getMiddleUpc() {
 		return middleUpc[upcIndice++];
 	}
 	
@@ -159,7 +129,7 @@ public class RegisterTest {
 	 * @param e Type de quantité
 	 * @return Un {@item} aléatoire correspondant, null s'il y a une erreur dans les paramètres
 	 */
-	private Item generateItem(String name, int a, int b, int c, int d, int e) {
+	private static Item generateItem(String name, int a, int b, int c, int d, int e) {
 		
 		// --------- Création de l'UPC ---------
 		char[] upcTab = new char[12];
@@ -311,7 +281,7 @@ public class RegisterTest {
 	 * @param newQuantity La nouvelle quantité
 	 * @return Un {@item} similaire
 	 */
-	private Item generateSameItem(Item item, double newQuantity) {
+	private static Item generateSameItem(Item item, double newQuantity) {
 		return new Item(
 				item.getUpc(),
 				item.getDescription(),
@@ -319,80 +289,51 @@ public class RegisterTest {
 				item.getRetailPrice()
 			);
 	}
-
 	
 	// -------------------------------------------------------------------------------------------------
-	// taille 3+
 	
 	/**
-	 * Test utilisant le petit rouleau avec plusieurs entrées ne devant pas générer d'exceptions
-	 * (a1 b1 c1 d1 e1) article unique
-	 * (a1 b2 c1 d2 e2) article quantité fractionnaire
-	 * (a1 b1 c5 d1 e1) article unique prix max
-	 * (a1 b1 c1 d1 e1) puis le même en quantité négatif (a1 b1 c1 d4 e1) : retrait d'article
-	 * (a1 b3 c1 d1 e1) coupon
-	 * (a1 b1 c1 d2 e1)	article quantité multiple entière
-	 * (a1 b3 c1 d1 e1) 2e coupon différent après article
-	 * (v5) Liste de plus de 5 articles différents avec 2 coupons -> réduction attendue (TODO comment on test?)
+	 * Test utilisant le petit rouleau utilisant toutes les classes ne devant pas générer d'exceptions
 	 */
-	@Test
-	public void Test_ManyGoodUses_noExceptions() {
-		register.changePaper(PaperRoll.SMALL_ROLL);
+	public static void AllOkTest() {
 		List<Item> grocery = new ArrayList<Item>();
+		// item unique
 		grocery.add(generateItem("Savon",		1, 1, 1, 1, 1));
+		// item quantité fractionnaire
 		grocery.add(generateItem("Tomates",		1, 2, 1, 2, 2));
+		// item prix max
 		grocery.add(generateItem("Truc cher",	1, 1, 5, 1, 1));
+		// ajout item pour retrait
 		Item couches = generateItem("Couches",	1, 1, 1, 1, 1);
 		grocery.add(couches);
 		grocery.add(generateSameItem(couches, (-1)*couches.getQuantity()));
+		// ajout d'un coupon
 		grocery.add(generateItem("Super reduc",	1, 3, 1, 1, 1));
+		// item quantité multiple entière
 		grocery.add(generateItem("Thon cons",	1, 1, 1, 2, 1));
+		// ajout d'un autre coupon
 		grocery.add(generateItem("Naze reduc",	1, 3, 1, 1, 1));
-		register.print(grocery);		
+		// resultat : pas d'erreurs attendues
+		System.out.println(register.print(grocery));	
+		resetMiddleUpc();
 	}
 	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 0
+
+	public static void main(String[] args) {
+		// Initialisation de la seed
+		long seed = rand.nextLong();
+		// Décommenter et changer cette ligne si on veut reproduire le même test
+		// seed = 962738903477909273L;
+		rand.setSeed(seed);
+		System.out.println("starting tests with seed : " + seed);
+		// Initialisation de la machine
+		register = Register.getRegister();
+		// Tests
+		register.changePaper(PaperRoll.SMALL_ROLL);
+		AllOkTest();
+		register.changePaper(PaperRoll.LARGE_ROLL);
+		// etc...
 	
-	/**
-	 * Test d'une liste vide : v0
-	 */
-	@Test(expected = RegisterException.EmptyGroceryListException.class)
-	public void Test_EmptyList_Exception() {
-		List<Item> grocery = new ArrayList<Item>();
-		grocery.clear();
-		register.print(grocery);
 	}
-	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 11+
-	
-	/**
-	 * Test d'un liste de 11 items valides différents : 11*(a1, b1, c1, d1, e1) -> v6
-	 */
-	@Test(expected = RegisterException.TooManyItemsException.class)
-	public void Test_11items_Exception() {
-		List<Item> grocery = new ArrayList<Item>();
-		// Rempli le tableau de 11 items en quantité uniques avec des cup différents
-		for(int i=0; i < 11; i++) {
-			grocery.add(generateItem("ITEM", 1, 1, 1, 1, 1));
-		}
-		register.print(grocery);
-	}
-	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 1
-	/*
-	@Test (expected = RegisterException.?.class)
-	public void Test_taille1_unItemAuPifQuiMarchePas() {
-		
-	}
-	*/
-	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 2
-	
-	// TODO : essayer de lever toutes les exceptions de la doc de toute les manières différents
 
 }
-
