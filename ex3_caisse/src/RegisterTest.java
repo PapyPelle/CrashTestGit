@@ -463,21 +463,7 @@ public class RegisterTest {
 		}
 		register.print(grocery);
 	}
-	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 1
-	/*
-	@Test (expected = RegisterException.?.class)
-	public void Test_taille1_unItemAuPifQuiMarchePas() {
-		
-	}
-	*/
-	
-	// -------------------------------------------------------------------------------------------------
-	//   Taille 2
-	
-	// TODO : essayer de lever toutes les exceptions de la doc de toute les manières différents
-	
+
 	// -------------------------------------------------------------------------------------------------
 	// Tests a2
 	
@@ -607,7 +593,7 @@ public class RegisterTest {
 	}
 	
 	/**
-	 * Test de deux fois le meme coupon 2*(a1, b3, c1, d2, e1) -> v2
+	 * Test de quantité > 1 coupons (a1, b3, c1, d2, e1) -> v2
 	 */
 	@Test (expected = CouponException.class)
 	public void TestSameCouponTwice() {
@@ -686,5 +672,23 @@ public class RegisterTest {
 		list.add(badOne);
 		register.print(list);
 	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests b3
+	
+	/**
+	 * Ajout d'un unique coupon valide (ne doit pas être pris en compte)
+	 * (a1,b3,c1,d1,e1) -> v1
+	 */
+	@Test
+	public void Test_uniqueVoucher() {
+		List<Item> list = new ArrayList<Item>();
+		list.add(generateItem("coupon",1,3,1,1,1));
+		String registerOut = register.print(list);
+		assertFalse(registerOut.contains("Coupon:"));		
+	}
+	
 }
+
+
 
