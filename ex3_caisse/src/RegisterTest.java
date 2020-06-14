@@ -398,13 +398,33 @@ public class RegisterTest {
 	// Tests a2
 	
 	/**
-	 * Item avec CUP invalide (a2, b1, c1, d2, e1)
-	 * (la simple utilisation d'un élément de la classe a2 doit lever une exception,
-	 * seul test utilisant a2)
+	 * Item avec CUP invalide (a2, b1, c1, d2, e1) -> v1
 	 */
 	@Test (expected = InvalidUpcException.class) 
 	public void TestInvalidUPC() {
 		Item badOne = generateItem("InvalidUPC", 2, 1, 1, 2, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Item avec CUP invalide commençant par 2 (a2, b2, c1, d2, e1) -> v1
+	 */
+	@Test (expected = InvalidUpcException.class)
+	public void TestInvalidUPCStart2() {
+		Item badOne = generateItem("InvalidUPC", 2, 2, 1, 2, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Item avec CUP invalide commençant par 5 (a2, b3, c1, d2, e1) -> v1
+	 */
+	@Test (expected = InvalidUpcException.class)
+	public void TestInvalidUPCStart5() {
+		Item badOne = generateItem("InvalidUPC", 2, 3, 1, 2, 1);
 		List<Item> list = new ArrayList<Item>();
 		list.add(badOne);
 		register.print(list);
@@ -419,6 +439,17 @@ public class RegisterTest {
 	@Test (expected = AmountException.NegativeAmountException.class)
 	public void TestNegativeItemCost() {
 		Item badOne = generateItem("NegCost", 1, 1, 2, 1, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Test d'ajout d'un item de quantité fractionnaire au prix négatif (a1, b2, c2, d1, e2) -> v1
+	 */
+	@Test (expected = AmountException.NegativeAmountException.class)
+	public void TestNegativeFracItemCost() {
+		Item badOne = generateItem("NegCost", 1, 2, 2, 1, 2);
 		List<Item> list = new ArrayList<Item>();
 		list.add(badOne);
 		register.print(list);
@@ -527,6 +558,47 @@ public class RegisterTest {
 	public void TestFracFirstUPC5() {
 		Item badOne = generateItem("Frac", 1, 3, 1, 3, 2);
 		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Tests d4
+	
+	/**
+	 * Ajout d'un item en quantité négative en premier
+	 * (a1, b1, c1, d4, e1) -> v1
+	 */
+	@Test (expected = Register.NoSuchItemException.class)
+	public void TestNegativeQuantityFirst() {
+		Item badOne = generateItem("NegativeQuantity", 1, 1, 1, 4, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Ajout d'un item fractionnaire en quantité négative en premier
+	 * (a1, b2, c1, d4, e2) -> v1
+	 */
+	@Test (expected = Register.NoSuchItemException.class)
+	public void TestFracNegativeQuantityFirst() {
+		Item badOne = generateItem("FracNegativeQuantity", 1, 2, 1, 4, 2);
+		List<Item> list = new ArrayList<Item>();
+		list.add(badOne);
+		register.print(list);
+	}
+	
+	/**
+	 * Ajout d'un coupon en quantité négative en premier
+	 * (a1, b1, c5, d1, e1) + (a1, b3, c1, d4, e1) -> v4
+	 */
+	@Test (expected = Register.NoSuchItemException.class)
+	public void TestVoucherNegativeQuantityFirst() {
+		Item entry = generateItem("Test", 1, 1, 5, 1, 1);
+		Item badOne = generateItem("VoucherNegativeQuantity", 1, 3, 1, 4, 1);
+		List<Item> list = new ArrayList<Item>();
+		list.add(entry);
 		list.add(badOne);
 		register.print(list);
 	}
