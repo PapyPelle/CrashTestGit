@@ -1,3 +1,4 @@
+package question2;
 /****************
  Monitoring d'appels de méthodes
  Cours: 8INF958
@@ -44,6 +45,7 @@ public class Teller
     			line = in.readLine();
     			account_no = new Integer(line).intValue();
     			System.out.println("Switched to account " + account_no + "\n");
+    			
     		}
     		else if (line.compareTo("4") == 0)
     		{
