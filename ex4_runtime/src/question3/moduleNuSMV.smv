@@ -76,45 +76,45 @@ ASSIGN
     esac;
      
 
-LTLSPEC
-  (
+
+
 /-- The two lights are never green at the same time --/
-    G ( !((w_light = green) & (e_light = green)) )
-  ) & (
-/-- West light remains green only for 3 successive states --/
+LTLSPEC
+    G ( !((w_light = green) & (e_light = green)) );
+
+/-- A light remains green only for 3 successive states --/
+LTLSPEC (
     G ( ((w_light = green) & X((w_light = green) & X(w_light = green)))
           -> X X X (w_light = red) )
   ) & (
-/-- East light remains green only for 3 successive states --/
     G ( ((e_light = green) & X((e_light = green) & X(e_light = green)))
           -> X X X (e_light = red) )
-  ) & (
-/-- West light only turns green if a car is waiting at west and that there
+  );
+
+/-- A light only turns green if a car is waiting and that there
 is no one on the bridge --/
+LTLSPEC (
     G ( ((w_light = red) & X(w_light = green)) -> (at_w & !on_bridge) )
   ) & (
-/-- East light only turns green if a car is waiting at east and that there
-is no one on the bridge --/
     G ( ((e_light = red) & X(e_light = green)) -> (at_e & !on_bridge) )
-  ) & (
-/-- If the west light is green, a car at the west intersection ends up on
-the bridge in the following state --/
+  );
+
+/-- If the light is green, a car at the corresponding intersection ends up
+on the bridge in the following state --/
+LTLSPEC (
     G ( ((w_light = green) & at_w) -> X(on_bridge) )
   ) & (
-/-- If the east light is green, a car at the east intersection ends up on
-the bridge in the following state --/
     G ( ((e_light = green) & at_e) -> X(on_bridge) )
   );
 
 
-CTLSPEC
-  (
-/-- A car does not wait indefinitely at the east red light --/
+/-- A car does not wait indefinitely at a red light --/
+CTLSPEC (
     AG ( at_e -> AF (e_light = green) )
   ) & (
-/-- A car does not wait indefinitely at the west red light --/
     AG ( at_w -> AF (w_light = green) )
-  ) & (
-/-- There is an execution where there never is a car --/
-    EG ( (!at_w & !at_e) & !on_bridge )
   );
+/-- There is an execution where there never is a car --/
+CTLSPEC
+    EG ( (!at_w & !at_e) & !on_bridge );
+
