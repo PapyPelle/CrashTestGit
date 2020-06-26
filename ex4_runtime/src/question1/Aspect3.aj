@@ -19,7 +19,7 @@ public aspect Aspect3 {
 			System.err.println("Unkown error"); // actually we know one reason : when pop is used on empty list. Not my task
 		}
 		else {
-			// It should be the same object reference, so we can use (not)equal here
+			// It should be the same object reference, so we can use (not)equal operator here
 			Object observerObject = observerStack.pop();
 			if (object != observerObject) {
 				String line = "" + thisJoinPointStaticPart.getSourceLocation().getLine();

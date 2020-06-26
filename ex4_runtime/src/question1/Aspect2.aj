@@ -27,7 +27,7 @@ public aspect Aspect2 {
 			if (stack.size() != size_before_pop - 1) {
 				String line = "" + thisJoinPointStaticPart.getSourceLocation().getLine();
 				System.err.println("ERROR PROPERTY 2 (line " + line +
-						"): method pop() not correctly reducing size by 1" );
+						"): method pop() not correctly reducing method size() result by 1" );
 			}
 		}
 		size_before_pop = -1;
@@ -53,7 +53,7 @@ public aspect Aspect2 {
 			if (stack.size() != size_before_push + 1) {
 				String line = "" + thisJoinPointStaticPart.getSourceLocation().getLine();
 				System.err.println("ERROR PROPERTY 2 (line " + line +
-						"): method push() not correctly increasing size by 1" );
+						"): method push() not correctly increasing method size() result by 1" );
 			}
 		}
 		size_before_push = -1;

@@ -1,10 +1,7 @@
 package question1;
 
 /**
- * Main for testing Aspect2 with the 2nd property :
- * 
- * The push method increases the stack size by 1,
- * and the pop method decreases the stack size by 1
+ * Main for testing AspectJ properties
  */
 public class MainTests {
 	
@@ -69,19 +66,19 @@ public class MainTests {
 	public static void Main1() {
 		StackInterface stack = new Stack();
 		if (stack.isEmpty()) {
-			System.out.println("Stack is empty");
+			System.out.println("Stack is empty : calling pop and top");
 		
 			stack.pop(); // error, wrong usage
 		
 			stack.top(); // error, wrong usage
 			
 		}
-		else { System.out.println("unknown error, stack should be empty"); }
+		else { System.out.println("unknown error, isEmpty() should return true"); }
 		
 		stack.push(42); // adding one element
 		
 		if (!stack.isEmpty()) {
-			System.out.println("Stack is NOT empty anymore");
+			System.out.println("Stack is NOT empty anymore : calling top and pop again");
 			
 			stack.top(); // no error
 			
@@ -90,10 +87,10 @@ public class MainTests {
 				stack.pop(); // no error
 				
 			}
-			else { System.out.println("unknown error, top() should not empty the stack"); }
+			else { System.out.println("unknown error, top() should not empty the stack here, isEmpty() should return false"); }
 		
 		}
-		else { System.out.println("unknown error, stack should not be empty after push"); }
+		else { System.out.println("unknown error, stack should not be empty after push, isEmpty() should return false"); }
 	}
 	
 	/**
@@ -106,7 +103,7 @@ public class MainTests {
 		
 		stack.pop();
 		
-		if (stack instanceof MyBadStack) { return; } // no need to flood, we know it's broken
+		if (stack instanceof MyBadStack) { return; } // no need to flood, we already have an error at this point
 
 		
 		// Test to go over stack size limit (should reallocate array and all)
@@ -160,12 +157,14 @@ public class MainTests {
 	 * Main function to test all aspect classes
 	 */
 	public static void main(String[] args) {
+
 		System.out.println("--- Test property 1 ---");
+		// Wrongly use the stack methods
 		Main1();
 		System.out.println("--------------------------------\n");
 		
 		System.out.println("--- Test property 2 ---");
-		// Test the stack in exercise
+		// Test the given stack
 		System.out.println("TEST exercise STACK");
 		Main2(new Stack());
 		System.out.println("--------------------------------\n");
@@ -175,7 +174,7 @@ public class MainTests {
 		System.out.println("--------------------------------\n");
 		
 		System.out.println("--- Test property 3 ---");
-		// Test the stack in exercise
+		// Test the given stack
 		System.out.println("TEST exercise STACK");
 		Main3(new Stack());
 		System.out.println("--------------------------------\n");
