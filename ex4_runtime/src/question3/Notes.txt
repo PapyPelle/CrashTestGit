@@ -1,0 +1,44 @@
+--- COMMANDE_LINUX ---
+./<PATH_TO>/NuSMV moduleNU.smv
+
+
+--- GLOBAL_LIGHT ---
+
+Cette variable prenant 3 états permet de mieux gérer les
+feux et réduire le nombre de branchements.
+e_light et w_light sont alors uniquement des indicateurs
+de l'un des 3 états de global_light (rr, gr ou rg).
+
+
+--- LTL_SPEC_3_4 ---
+Nous avons décider de grouper :
+3. Un feu ne devient vert que si une voiture attend
+4. Un feu ne peut passer au vert si des voitures sont sur
+le pont
+En :
+34. Un feu ne devient vert que si une voiture attend et
+qu'il n'y a personne sur le pont. 
+
+
+--- CTL_SPEC_ET_INIT ---
+
+Au départ, nous n'avions pas défini de valeur initiale
+pour les booléens "at_w" "at_e" et "on_bridge", permettant
+au système de démarrer au rouge mais avec des voitures
+déjà "présentes".
+Cependant, cela ne respectait pas la 1ere specification CTL
+(il existe une exécution sans jamais de voiture) puisqu'il
+semblerait que si l'un des états initiaux possibles viole
+cette spécification, alors celle-ci est fausse.
+Il n'y a donc plus qu'un état initial de notre système.
+
+
+--- ALTERN ---
+
+Ce booléen à été rajouté car nous nous sommes rendu compte
+qu'une exécution possible de notre implémentation était que
+le feu côté ouest prenait toujours la priorité sur le feu
+est, et donc cela ne respectait pas la spécification CTL
+disant qu'une voiture n'attend jamais indéfiniment (sans 
+cette correction, si le trafique côté ouest ne s'arrête
+jamais, la voiture côté est ne verra jamais de feu vert).

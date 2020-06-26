@@ -1,0 +1,120 @@
+-- PLZ read the notes from the .txt document in the same folder --
+
+MODULE main
+
+VAR
+  at_e : boolean;
+  at_w : boolean; 
+
+  on_bridge : boolean;
+  w_light : {green, red};
+  e_light : {green, red};
+
+  t : 1 .. 3;
+  altern : boolean;
+  global_light : {west, east, none};
+
+ASSIGN
+  init(t) := 1;
+  init(altern) := FALSE;
+  init(global_light) := none;
+  init(w_light) := red;
+  init(e_light) := red;
+
+  init(at_w) := FALSE;
+  init(at_e) := FALSE;
+  init(on_bridge) := FALSE;
+  
+  next(t) := case
+    !(global_light = none) & (t < 3) : t + 1;
+    TRUE : 1;
+    esac;
+
+  next(global_light) := case
+    (global_light = none) : case
+      !on_bridge : case
+        at_w & (at_e -> altern) : west;
+        at_e : east;
+        TRUE : none;
+        esac;
+      TRUE : none;
+      esac;
+    TRUE : case
+      (t = 3) : none;
+      TRUE : global_light;
+      esac;
+    esac;
+  
+  next(altern) := case
+    (global_light = none) & !(next(global_light) = none) : !altern;
+    TRUE : altern;
+    esac;
+    
+  next(at_w) := case
+    at_w & !(global_light = west) : TRUE;
+    TRUE : {TRUE, FALSE};
+    esac;
+  
+  next(at_e) := case
+    at_e & !(global_light = east) : TRUE;
+    TRUE : {TRUE, FALSE};
+    esac;
+  
+  next(on_bridge) := case
+    (global_light = east & at_e) | (global_light = west & at_w) : TRUE;
+    TRUE : FALSE;
+    esac;
+  
+  next(w_light) := case
+    (next(global_light) = west) : green;
+    TRUE : red;
+    esac;
+
+  next(e_light) := case
+    (next(global_light) = east) : green;
+    TRUE : red;
+    esac;
+     
+
+LTLSPEC
+  (
+/-- The two lights are never green at the same time --/
+    G ( !((w_light = green) & (e_light = green)) )
+  ) & (
+/-- West light remains green only for 3 successive states --/
+    G ( ((w_light = green) & X((w_light = green) & X(w_light = green)))
+          -> X X X (w_light = red) )
+  ) & (
+/-- East light remains green only for 3 successive states --/
+    G ( ((e_light = green) & X((e_light = green) & X(e_light = green)))
+          -> X X X (e_light = red) )
+  ) & (
+/-- West light only turns green if a car is waiting at west and that there
+is no one on the bridge --/
+    G ( ((w_light = red) & X(w_light = green)) -> (at_w & !on_bridge) )
+  ) & (
+/-- East light only turns green if a car is waiting at east and that there
+is no one on the bridge --/
+    G ( ((e_light = red) & X(e_light = green)) -> (at_e & !on_bridge) )
+  ) & (
+/-- If the west light is green, a car at the west intersection ends up on
+the bridge in the following state --/
+    G ( ((w_light = green) & at_w) -> X(on_bridge) )
+  ) & (
+/-- If the east light is green, a car at the east intersection ends up on
+the bridge in the following state --/
+    G ( ((e_light = green) & at_e) -> X(on_bridge) )
+  );
+
+
+CTLSPEC
+  (
+/-- A car does not wait indefinitely at the east red light --/
+    AG ( at_e -> AF (e_light = green) )
+  ) & (
+/-- A car does not wait indefinitely at the west red light --/
+    AG ( at_w -> AF (w_light = green) )
+  ) & (
+/-- There is an execution where there never is a car --/
+    EG ( (!at_w & !at_e) & !on_bridge )
+  );

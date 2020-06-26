@@ -1,0 +1,175 @@
+<h2> Un chien de garde pour votre système </h2>
+
+<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow" id="yui_3_17_2_1_1593190354562_46"><img src="img/Traceability.png" alt="Chien qui renifle" class="img-responsive atto_image_button_text-bottom" width="428" height="132"><p></p>
+
+<h3>Objectifs</h3>
+
+<ul>
+<li>modéliser des propriétés sur le comportement d'un système au moyen des automates et de la logique temporelle</li>
+<li>utiliser le principe de la surveillance à l'exécution (runtime verification) et de model checking pour tester ou vérifier des propriétés</li></ul><ul>
+</ul>
+
+<h3>Préalables</h3>
+
+<p>Ce devoir vous demande d'utiliser la librairie AspectJ. Vous devez d'abord installer dans Eclipse les <a href="https://www.eclipse.org/ajdt/">AspectJ Development Tools</a> (AJDT). Pour ce faire, cliquez sur <i>Help</i>, <i>Eclipse Marketplace</i>, cherchez le terme "AJDT" et installez la dernière version de cette extension en choisissant les options par défaut. Vous devez ensuite redémarrer Eclipse.</p>
+
+<p>Par la suite, pour intégrer AspectJ dans votre projet, vous devez choisir <i>New</i>, et sous l'onglet AspectJ, choisir <i>AspectJ Project</i>:</p>
+
+<p><img src="img/New_AspectJ.png" alt="Screenshot AspectJ" class="img-responsive atto_image_button_text-bottom" width="612" height="499"></p>
+
+<p>On vous suggère de consulter un <a href="https://o7planning.org/fr/10257/tutoriel-de-java-aspect-oriented-programming-avec-aspectj">tutoriel en français</a> sur les rudiments d'AspectJ dans Eclipse.</p><p>La seconde partie du devoir vous demande de modéliser des conditions sur des appels de méthodes et de les monitorer au moyen de la librairie BeepBeep. Tel que mentionné dans les diapositives du cours, la spécification est d'abord saisie dans un fichier, et un formulaire en ligne est utiliser pour automatiquement générer l'aspect monitorant la propriété. Dans ce cas, votre projet doit inclure la librairie beepbeep.jar. Des liens vers ces ressources dont donnés dans la page du cours.</p><p><b>Attention</b>: il existe une autre version plus récente de BeepBeep située sur un autre site web. Pour les besoins de ce travail, il est bien important d'utiliser la librairie fournie (version 0.9.3).<br></p>
+
+<h3 id="yui_3_17_2_1_1593190354562_58">Partie 1: runtime monitoring avec AspectJ</h3>
+
+<p>On considère l'interface suivante, décrivant les méthodes d'une pile:</p>
+
+<pre>interface StackInterface {
+  public void push(Object t);
+  public Object pop();
+  public Object top();
+  public boolean isEmpty();
+  public int size();
+}
+</pre>
+
+Le programme suivant utilise la classe Stack, qui implémente l'interface
+ci-dessus. Il ajoute des éléments à la pile puis retire ces éléments de la pile.
+
+<pre>class Test {
+  public static void main(String[] args) {
+    StackInterface stack = new Stack();
+    for (int i = 0; i &lt; 1500; i++) {
+      stack.push(i);
+    }
+    for (int i = 0; i &lt; 1500; i++) {
+      stack.pop();
+    }
+  }
+}
+</pre>
+
+<p>En utilisant AspectJ, écrivez trois aspects (appelés <tt>Aspect1</tt>, <tt>Aspect2</tt>, <tt>Aspect3</tt>)
+vérifiant chacune des trois règles suivantes du comportement de la pile:</p>
+
+<ol>
+<li>Les méthodes <tt>top</tt> et <tt>pop</tt> ne sont jamais appelées sur une pile vide</li>
+<li>La méthode <tt>push</tt> augmente la taille de la pile de 1, et la méthode
+<tt>pop</tt> diminue la taille de la pile de 1 (la taille s'obtient par la méthode <tt>size</tt>)</li>
+<li>Les éléments de la pile sont retirés dans l'ordre inverse de leur
+insertion. Pour vérifier cette troisième propriété, comparez le comportement
+de la classe Stack avec celui d'une implémentation que l'on sait fiable,
+par exemple la classe <tt>java.util.Stack</tt>.</li>
+</ol>
+
+<p>Chacun des trois aspects devra afficher à la console (via <tt>System.out.println</tt>) le message "Erreur de la propriété X" immédiatement avant un appel de méthode violant la propriété X (1, 2 ou 3). Pour illustrer le bon fonctionnement de vos trois aspects, écrivez également trois programmes Main, appelés <tt>Main1</tt>, <tt>Main2</tt>, <tt>Main3</tt>, qui utilisent incorrectement la pile.</p>
+
+<h3>Partie 2: runtime monitoring avec JavaMOP</h3>
+
+<p>Sur le site du cours se trouve l'archive <tt>Teller.zip</tt> contenant un certain nombre de classes Java, incluant une classe <tt>Bank</tt> qui propose un ensemble de méthodes pour effectuer des transactions financières, selon l'interface suivante:</p>
+
+<pre>class Bank {
+  public void open(int accountNo);
+  public void close(int accountNo);
+  public boolean isApproved(int accountNo, int amount);
+  public void withdraw(int accountNo, int amount);
+}
+</pre>
+
+<p>La classe <tt>Teller</tt> est un programme simple permettant à l'utilisateur
+d'invoquer ces différentes opérations par le biais d'un menu à
+la ligne de commande. On doit cependant respecter les contraintes suivantes
+en utilisant la banque:</p>
+
+<ol>
+<li>Les opérations <tt>isApproved</tt> et <tt>withdraw</tt> ne peuvent être effectuées que
+  si un compte est ouvert.</li>
+<li>On ne peut ouvrir plus d'un compte simultanément.</li>
+<li> Un retrait de plus de 1&nbsp;000&nbsp;$ ne peut être effectué que si l'appel
+  à isApproved a retourné <tt>true</tt>.</li>
+</ol>
+
+<p>On suppose que toutes les opérations sont effectuées avec le même numéro de
+compte.</p>
+
+<p>Écrivez une spécification LTL-FO+ permettant de monitorer ces contraintes,
+en utilisant le moniteur BeepBeep. Tissez l'aspect résultant
+aux classes <tt>Bank</tt> et <tt>Teller</tt> et constatez en utilisant le
+programme que les séquences interdites sont bien interceptées par le moniteur.</p>
+
+<h3>Partie 3: modélisation avec NuSMV</h3>
+
+<p>Dans cette dernière partie, on vous demande de modéliser le fonctionnement d'un système de feux de circulation contrôlant l'accès à un pont doté d'une seule voie. La figure ci-dessous illustre la situation:</p>
+
+<p><img src="img/Pont.png" alt="Pont" class="img-responsive atto_image_button_text-bottom" width="673" height="237"></p>
+
+<p>Sous la surface de la route se trouvent des senseurs pour détecter si des voitures sont présentes à certains endroits. Les senseurs sont:</p>
+
+<ul>
+<li><tt>at_w</tt>: des voitures sont présentes au feu du côté ouest et attendent de passer sur le pont</li>
+<li><tt>at_e</tt>: des voitures sont présentes au feu du côté est et attendent de passer sur le pont</li>
+<li><tt>on_bridge</tt>: des voitures sont présentes sur le pont</li>
+</ul>
+
+<p>Deux feux de circulation contrôlent l'accès au pont: <tt>w_light</tt> représente le feu du côté ouest, et <tt>e_light</tt> celui du côté est. Chacun de ces deux feux peut être soit dans l'état <tt>green</tt> (feu vert) ou <tt>red</tt> (feu rouge). Pour les besoins de la modélisation, on suppose que lorsqu'un des feux devient vert, il le reste pour trois pas de temps. Le passage des voitures est tel que, si le senseur <tt>at_w</tt> détecte une voiture, le senseur <tt>on_bridge</tt> détecte cette même voiture au pas de temps suivant, et la voiture est sortie du modèle dans l'état suivant (raisonnement similaire pour <tt>at_e</tt>).</p>
+
+<p id="yui_3_17_2_1_1593190354562_51">Écrivez un modèle NuSMV représentant cette situation. De plus, rédigez des formules <strong>LTL</strong> représentant les propriétés que votre modèle doit respecter:</p>
+
+<ol id="yui_3_17_2_1_1593190354562_45">
+<li id="yui_3_17_2_1_1593190354562_53">Les deux feux ne sont jamais verts en même temps</li>
+<li id="yui_3_17_2_1_1593190354562_54">Chaque feu ne reste vert que pour 3 états successifs</li>
+<li>Un feu ne devient vert que si une voiture attend</li>
+<li>Un feu ne peut passer au vert si des voitures sont sur le pont</li>
+<li id="yui_3_17_2_1_1593190354562_55">Si un feu est vert, une voiture à l'intersection correspondante se retrouve sur le pont dans l'état suivant</li>
+</ol>
+
+<p id="yui_3_17_2_1_1593190354562_57">Ces formules doivent être clairement identifiées et figurer dans la partie <tt>LTLSPEC</tt> de votre fichier.</p>
+
+<p>Enfin, vérifiez si, dans votre modèle, les propriétés suivantes sont vraies en écrivant des propriétés <strong>CTL</strong>:</p>
+
+<ol id="yui_3_17_2_1_1593190354562_50">
+<li id="yui_3_17_2_1_1593190354562_56">Il existe une exécution où il n'y a jamais de voiture</li>
+<li id="yui_3_17_2_1_1593190354562_49">Une voiture n'attend pas indéfiniment au feu rouge</li>
+</ol>
+
+<p id="yui_3_17_2_1_1593190354562_52">Ces formules doivent être clairement identifiées et figurer dans la partie <tt>SPEC</tt> de votre fichier. Au moyen de commentaires, dites si les formules correspondantes sont vraies ou non, et expliquez brièvement pourquoi.</p>
+
+<h3>Modalités de remise</h3>
+
+<p>Produisez une archive selon les directives suivantes:</p>
+
+<ul>
+<li>Le nom de l'archive doit être le nom de famille de l'un des équipiers
+suivi du numéro du TP. Par exemple: <tt>Halle-Devoir4.zip</tt></li>
+<li>À la racine de l'archive doit se trouver un fichier texte, appelé
+<tt>Equipe.txt</tt>, donnant le nom complet et le code permanent de chaque membre de l'équipe<ul>
+
+</ul>
+</li>
+<li>Un répertoire appelé <tt>Question1</tt> doit contenir les fichiers source
+tel que modifié pour répondre aux consignes de la première partie.</li><li>Un répertoire appelé <tt>Question2</tt> doit contenir les fichiers d'entrée du moniteur BeepBeep correspondant à chacune des trois propriétés demandées.<br></li>
+<li>Un fichier appelé <tt>modele.smv</tt> doit être fourni et correspondre à la modélisation de la partie 3</li>
+</ul>
+
+<h3>Évaluation</h3>
+
+<p>Le devoir sera évalué selon la grille de correction suivante:</p>
+
+<table border="1">
+<tbody><tr><th>Élément</th><th>Points</th></tr>
+<tr><td>Aspect 1</td><td>1</td></tr>
+<tr><td>Aspect 2</td><td>2</td></tr>
+<tr><td>Aspect 3</td><td>2</td></tr>
+<tr><td>Syntaxe LTL-FO+</td><td>1</td></tr>
+<tr><td>Propriété 1</td><td>2</td></tr>
+<tr><td>Propriété 2</td><td>2</td></tr>
+<tr><td>Propriété 3</td><td>2</td></tr>
+<tr><td>Syntaxe NuSMV</td><td>1</td></tr>
+<tr><td>Formule LTL 1</td><td>1</td></tr>
+<tr><td>Formule LTL 2</td><td>1</td></tr>
+<tr><td>Formule LTL 3</td><td>1</td></tr>
+<tr><td>Formule LTL 4</td><td>1</td></tr>
+<tr><td>Formule LTL 5</td><td>1</td></tr>
+<tr><td>Formule CTL 1</td><td>1</td></tr>
+<tr><td>Formule CTL 2</td><td>1</td></tr>
+<tr><td><strong>TOTAL</strong></td><td><strong>20</strong></td></tr>
+</tbody></table></div></div>

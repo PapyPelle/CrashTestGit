@@ -1,0 +1,18 @@
+
+
+-------------------------------------------------
+PROTOTYPES
+void Bank.open(int act);
+void Bank.close(int act);
+void Bank.withdraw(int act, int amt);
+boolean Bank.isApproved(int act, int amt);
+
+SPEC LTL-FO+
+
+
+@FALSE {
+  System.out.println("The error was successfully caught !");
+}
+
+---------------------------------------------------------------------------------
+
