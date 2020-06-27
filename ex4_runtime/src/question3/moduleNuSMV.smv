@@ -11,12 +11,12 @@ VAR
   e_light : {green, red};
 
   t : 1 .. 3;
-  altern : boolean;
+  prio : boolean;
   global_light : {west, east, none};
 
 ASSIGN
   init(t) := 1;
-  init(altern) := FALSE;
+  init(prio) := FALSE;
   init(global_light) := none;
   init(w_light) := red;
   init(e_light) := red;
@@ -33,21 +33,29 @@ ASSIGN
   next(global_light) := case
     (global_light = none) : case
       !on_bridge : case
-        at_w & (at_e -> altern) : west;
+        at_w & (at_e -> prio) : west;
         at_e : east;
         TRUE : none;
         esac;
       TRUE : none;
       esac;
     TRUE : case
-      (t = 3) : none;
+      (t = 3) : case
+        !on_bridge : case
+          at_w & (global_light = east) : west;
+          at_e & (global_light = west) : east;
+          TRUE : none;
+          esac;
+        TRUE : none;
+        esac;
       TRUE : global_light;
       esac;
     esac;
   
-  next(altern) := case
-    (global_light = none) & !(next(global_light) = none) : !altern;
-    TRUE : altern;
+  next(prio) := case
+    (global_light = east) : TRUE;
+    (global_light = west) : FALSE;
+    TRUE : prio;
     esac;
     
   next(at_w) := case
@@ -84,11 +92,11 @@ LTLSPEC
 
 /-- A light remains green only for 3 successive states --/
 LTLSPEC (
-    G ( ((w_light = green) & X((w_light = green) & X(w_light = green)))
-          -> X X X (w_light = red) )
+    G ( (w_light = red) & X(w_light = green) -> 
+          (X X(w_light = green) & X X X(w_light = green) & X X X X(w_light = red)) )
   ) & (
-    G ( ((e_light = green) & X((e_light = green) & X(e_light = green)))
-          -> X X X (e_light = red) )
+    G ( (e_light = red) & X(e_light = green) -> 
+          (X X(e_light = green) & X X X(e_light = green) & X X X X(e_light = red)) )
   );
 
 /-- A light only turns green if a car is waiting and that there
