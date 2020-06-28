@@ -1,0 +1,55 @@
+PROTOTYPES
+
+void Bank.open(int account);
+void Bank.close(int account);
+void Bank.withdraw(int account, int amount);
+boolean Bank.isApproved(int account, int amount);
+<return>
+    <method>isApproved</method>
+    <arg>
+        <account>
+            <value>{account}</value>
+        </account>
+    </arg>
+    <arg>
+        <amount>
+            <value>{amount}</value>
+        </amount>
+    </arg>
+    <retval>
+        <value>{ret}</value>
+    </retval>
+</return>
+
+SPEC LTL-FO+
+G ((
+	<m1 /return/method> (
+		[a1 /return/arg/account/value] (
+			[am1 /return/arg/amount/value] (
+				[ret /return/retval/value] (
+					X ([m2 /call/method] (
+						[a2 /call/arg/account/value] (
+							[am2 /return/arg/amount/value] (
+								(((m2) = ({withdraw})) & (!((am2) < ({1000})))) ->
+									((((m1) = ({isApproved})) & ((am1) = (am2))) & (({ret}) = ({true})))
+							)
+						)
+					))
+				)
+			)
+		)
+	))
+	| (
+		[m2 /call/method] (
+			((m2) = ({withdraw})) -> (
+				[am2 /call/arg/amount/value] ( 
+					(am2) < ({1000})
+				)
+			)
+		)
+	)
+)
+
+@FALSE {
+  System.out.println("Cannot withdraw more than 1000 if isApproved did not work");
+}
