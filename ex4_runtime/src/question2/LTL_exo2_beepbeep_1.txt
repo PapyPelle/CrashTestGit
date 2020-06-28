@@ -1,0 +1,32 @@
+PROTOTYPES
+
+void Bank.open(int account);
+void Bank.close(int account);
+void Bank.withdraw(int account, int amount);
+boolean Bank.isApproved(int account, int amount);
+
+SPEC LTL-FO+
+(
+	[m1 /call/method] (
+		(!(((m1) = ({isApproved})) | ((m1) = ({withdraw})))) U
+		((m1) = ({open}))
+	)
+)
+& (
+	G (
+		[m2 /call/method] (
+			((m2) = ({close})) -> (
+				X (
+					[m3 /call/method] (
+						(!(((m3) = ({isApproved})) | ((m3) = ({withdraw})))) U
+						((m3) = ({open}))
+					)
+				)
+			)
+		)
+	)
+)
+
+@FALSE {
+  System.out.println("Cannot withdraw or ask approval until the account is oppened");
+}
