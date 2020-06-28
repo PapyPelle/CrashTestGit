@@ -86,7 +86,7 @@ public class Bank
 		    }
 		    else
 		    {
-		    	int randAmount = (int) Math.random() * 2000;
+		    	int randAmount = (int) (Math.random() * 2000);
 		    	if (amount <= randAmount)
 		    	{
 		    		ai.m_authorizedFor = randAmount;

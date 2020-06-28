@@ -29,9 +29,9 @@ G ((
 				[ret /return/retval/value] (
 					X ([m2 /call/method] (
 						[a2 /call/arg/account/value] (
-							[am2 /return/arg/amount/value] (
+							[am2 /call/arg/amount/value] (
 								(((m2) = ({withdraw})) & (!((am2) < ({1000})))) ->
-									((((m1) = ({isApproved})) & ((am1) = (am2))) & (({ret}) = ({true})))
+									(((((m1) = ({isApproved})) & ((ret) = ({true}))) & ((am1) = (am2))) & ((a1) = (a2)))
 							)
 						)
 					))
@@ -39,7 +39,7 @@ G ((
 			)
 		)
 	))
-	| (
+	| (X (
 		[m2 /call/method] (
 			((m2) = ({withdraw})) -> (
 				[am2 /call/arg/amount/value] ( 
@@ -47,7 +47,7 @@ G ((
 				)
 			)
 		)
-	)
+	))
 )
 
 @FALSE {

@@ -1,0 +1,23 @@
+PROTOTYPES
+
+void Bank.open(int account);
+void Bank.close(int account);
+void Bank.withdraw(int account, int amount);
+boolean Bank.isApproved(int account, int amount);
+
+SPEC LTL-FO+
+G (
+	[m1 /call/method] (
+		((m1) = ({open})) ->
+		(X (
+			[m2 /call/method] (
+				(!((m2) = ({open}))) U
+				((m2) = ({close}))
+			)
+		))
+	)
+)
+
+@FALSE {
+  System.out.println("Cannot open another account until the current is closed");
+}
