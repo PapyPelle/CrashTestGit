@@ -4,35 +4,35 @@ import java.util.*;
 import ca.uqam.info.logic.LTLStringParser;
 import ca.uqam.info.runtime.symbolic.SymbolicWatcher;
  
-public aspect Catching
+public aspect Test1
 {
  
   SymbolicWatcher w;  
  
-  Catching()
+  Test1()
   {
     w = new SymbolicWatcher();
-    w.setFormula(LTLStringParser.parseFromString("([m1 /call/method] ((G (!((m1) = ({close})))) W ((m1) = ({open}))))"));
+    w.setFormula(LTLStringParser.parseFromString("( [m1 /call/method] ( (!(((m1) = ({isApproved})) | ((m1) = ({withdraw})))) U ((m1) = ({open})) ) ) & ( G ( [m2 /call/method] ( ((m2) = ({close})) -> ( X ( [m3 /call/method] ( (!(((m3) = ({isApproved})) | ((m3) = ({withdraw})))) U ((m3) = ({open})) ) ) ) ) ) )"));
   }
  
  
-  pointcut open(Bank _methtarget, int act) :
-    call(void open(int)) && target(_methtarget) && args(act);
+  pointcut open(Bank _methtarget, int account) :
+    call(void open(int)) && target(_methtarget) && args(account);
  
  
-  void around(Bank _methtarget, int act) : open(_methtarget, act)
+  void around(Bank _methtarget, int account) : open(_methtarget, account)
   {
     //long startDate = System.currentTimeMillis();
     String ficxml;
     ficxml="<call>\n";
     ficxml+="  <method>open</method>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <act>\n";
+    ficxml+="    <account>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[0] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </act>\n";
+    ficxml+="    </account>\n";
     ficxml+="  </arg>\n";
-    proceed(_methtarget, act);
+    proceed(_methtarget, account);
     ficxml+="</call>\n";
     w.update(ficxml);
  
@@ -47,23 +47,23 @@ public aspect Catching
  
   }
  
-  pointcut close(Bank _methtarget, int act) :
-    call(void close(int)) && target(_methtarget) && args(act);
+  pointcut close(Bank _methtarget, int account) :
+    call(void close(int)) && target(_methtarget) && args(account);
  
  
-  void around(Bank _methtarget, int act) : close(_methtarget, act)
+  void around(Bank _methtarget, int account) : close(_methtarget, account)
   {
     //long startDate = System.currentTimeMillis();
     String ficxml;
     ficxml="<call>\n";
     ficxml+="  <method>close</method>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <act>\n";
+    ficxml+="    <account>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[0] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </act>\n";
+    ficxml+="    </account>\n";
     ficxml+="  </arg>\n";
-    proceed(_methtarget, act);
+    proceed(_methtarget, account);
     ficxml+="</call>\n";
     w.update(ficxml);
  
@@ -78,29 +78,29 @@ public aspect Catching
  
   }
  
-  pointcut withdraw(Bank _methtarget, int act, int amt) :
-    call(void withdraw(int, int)) && target(_methtarget) && args(act, amt);
+  pointcut withdraw(Bank _methtarget, int account, int amount) :
+    call(void withdraw(int, int)) && target(_methtarget) && args(account, amount);
  
  
-  void around(Bank _methtarget, int act, int amt) : withdraw(_methtarget, act, amt)
+  void around(Bank _methtarget, int account, int amount) : withdraw(_methtarget, account, amount)
   {
     //long startDate = System.currentTimeMillis();
     String ficxml;
     ficxml="<call>\n";
     ficxml+="  <method>withdraw</method>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <act>\n";
+    ficxml+="    <account>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[0] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </act>\n";
+    ficxml+="    </account>\n";
     ficxml+="  </arg>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <amt>\n";
+    ficxml+="    <amount>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[1] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </amt>\n";
+    ficxml+="    </amount>\n";
     ficxml+="  </arg>\n";
-    proceed(_methtarget, act,amt);
+    proceed(_methtarget, account,amount);
     ficxml+="</call>\n";
     w.update(ficxml);
  
@@ -115,29 +115,29 @@ public aspect Catching
  
   }
  
-  pointcut isApproved(Bank _methtarget, int act, int amt) :
-    call(boolean isApproved(int, int)) && target(_methtarget) && args(act, amt);
+  pointcut isApproved(Bank _methtarget, int account, int amount) :
+    call(boolean isApproved(int, int)) && target(_methtarget) && args(account, amount);
  
  
-  boolean around(Bank _methtarget, int act, int amt) : isApproved(_methtarget, act, amt)
+  boolean around(Bank _methtarget, int account, int amount) : isApproved(_methtarget, account, amount)
   {
     //long startDate = System.currentTimeMillis();
     String ficxml;
     ficxml="<call>\n";
     ficxml+="  <method>isApproved</method>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <act>\n";
+    ficxml+="    <account>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[0] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </act>\n";
+    ficxml+="    </account>\n";
     ficxml+="  </arg>\n";
     ficxml+="  <arg>\n";
-    ficxml+="    <amt>\n";
+    ficxml+="    <amount>\n";
     ficxml+="      <value>"+ thisJoinPoint.getArgs()[1] +"</value>\n";
     ficxml+="      <type>int</type>\n";
-    ficxml+="    </amt>\n";
+    ficxml+="    </amount>\n";
     ficxml+="  </arg>\n";
-    boolean ret = proceed(_methtarget, act,amt);
+    boolean ret = proceed(_methtarget, account,amount);
     ficxml+="</call>\n";
     w.update(ficxml);
  
@@ -153,8 +153,10 @@ public aspect Catching
  
   }
  
-  private void outComeFalse()
-  {
-	  System.out.println("AH SHIT\nHERE WE GO AGAIN");
+  private void outComeFalse(){
+    {
+  System.out.println("Cannot withdraw or ask approval until the account is oppened");
+}
   }
+ 
 }
